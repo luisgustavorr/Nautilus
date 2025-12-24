@@ -9,7 +9,7 @@ type UserSaved struct {
 	Permission_level int    `json:"permission_level"`
 }
 
-func NewUserSaved(id_apps int, name string, description string, role string, opts ...func(*UserSaved)) *UserSaved {
+func NewUserSaved(id_apps int, name string, description string, opts ...func(*UserSaved)) *UserSaved {
 	e := &UserSaved{
 		Id_apps:          id_apps,
 		Name:             name,

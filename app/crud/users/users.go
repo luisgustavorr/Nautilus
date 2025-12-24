@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func AddUsers(userToSave UserSaved) (error, int) {
+func AddUser(userToSave UserSaved) (error, int) {
 	var insertedId int
 	var err error
 
@@ -33,4 +33,19 @@ func GetUsers(userId int) (error, []UserSaved) {
 		}
 	}
 	return err, usersSaved
+}
+
+func UpdateUser(userToSave UserSaved) error {
+	fmt.Println(General.JsonViewInterface(userToSave))
+	_, err := General.DB.Exec("UPDATE users SET id_apps = $1,name =$2,description=$3,role=$4,permission_level=$5 WHERE id = $6",
+		userToSave.Id_apps, userToSave.Name, userToSave.Description, userToSave.Role, userToSave.Permission_level, userToSave.Id)
+	return err
+}
+
+func DeleteUser(userId int) error {
+	if userId == 0 {
+		return fmt.Errorf("userId = 0")
+	}
+	_, err := General.DB.Exec("DELETE from users WHERE id = $1", userId)
+	return err
 }
