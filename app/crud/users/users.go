@@ -20,13 +20,13 @@ func GetUsers(userId int) (error, []UserSaved) {
 	if userId != 0 {
 		filter = fmt.Sprintf(" WHERE id = %d", userId)
 	}
-	query := fmt.Sprintf("SELECT  id,id_apps,name,description,role,permission_level FROM users %s", filter)
+	query := fmt.Sprintf("SELECT  id,id_apps,name,description,role,permission_level,profile_picture FROM users %s", filter)
 	rows, err := General.DB.Query(query)
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
 			userSaved := UserSaved{}
-			err = rows.Scan(&userSaved.Id, &userSaved.Id_apps, &userSaved.Name, &userSaved.Description, &userSaved.Role, &userSaved.Permission_level)
+			err = rows.Scan(&userSaved.Id, &userSaved.Id_apps, &userSaved.Name, &userSaved.Description, &userSaved.Role, &userSaved.Permission_level, &userSaved.Profile_picture)
 			if err == nil {
 				usersSaved = append(usersSaved, userSaved)
 			}

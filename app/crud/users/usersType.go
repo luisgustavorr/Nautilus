@@ -7,6 +7,7 @@ type UserSaved struct {
 	Description      string `json:"description"`
 	Role             string `json:"role"`
 	Permission_level int    `json:"permission_level"`
+	Profile_picture  string `json:"profile_picture"`
 }
 
 func NewUserSaved(id_apps int, name string, description string, opts ...func(*UserSaved)) *UserSaved {
@@ -15,6 +16,7 @@ func NewUserSaved(id_apps int, name string, description string, opts ...func(*Us
 		Name:             name,
 		Description:      description,
 		Role:             "Usuário",
+		Profile_picture:  "",
 		Permission_level: 0,
 	}
 	for _, opt := range opts {
@@ -35,5 +37,10 @@ func WithRole(r string) func(*UserSaved) {
 func WithPermissionLevel(p int) func(*UserSaved) {
 	return func(e *UserSaved) {
 		e.Permission_level = p
+	}
+}
+func WithProfile_picture(p string) func(*UserSaved) {
+	return func(e *UserSaved) {
+		e.Profile_picture = p
 	}
 }

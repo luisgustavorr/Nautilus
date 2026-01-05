@@ -60,6 +60,26 @@ func GetErrors(errorId int) (error, []ErrorSaved) {
 	}
 	return err, errorsRecovereds
 }
+func GetErrorsByAppId(appId int) (error, []ErrorSaved) {
+	if appId == 0 {
+		return fmt.Errorf("appId = 0, falha ao selecionar errors"), []ErrorSaved{}
+	}
+	rows, err := General.DB.Query("SELECT id,id_apps,message,title,verified,error_level,creator_id,created_in,last_edited_in,how_to_reproduce,error_occurred_in FROM errors WHERE id_apps = $1", appId)
+	var errorsRecovereds []ErrorSaved
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var errorSelected ErrorSaved
+			err = rows.Scan(&errorSelected.Id, &errorSelected.Id_apps, &errorSelected.Message, &errorSelected.Title, &errorSelected.Verified,
+				&errorSelected.Error_level, &errorSelected.Creator_id, &errorSelected.Created_in, &errorSelected.Last_edited_in,
+				&errorSelected.How_to_reproduce, &errorSelected.Error_occurred_in)
+			if err == nil {
+				errorsRecovereds = append(errorsRecovereds, errorSelected)
+			}
+		}
+	}
+	return err, errorsRecovereds
+}
 func UpdateErrors(errorToSave ErrorSaved) error {
 	query := `
 	UPDATE errors SET 

@@ -1,3 +1,47 @@
 {{template "partials/header" .}}
 {{template "partials/sidebar" .}}
-home
+<section id="body_wrapper">
+    <section id="search_errors_wrapper">
+        <div id="search_errors">
+            <input placeholder="Pesquisa por erro, tag ou #" type="text" name="search_errors_input"
+                id="search_errors_input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <button id="filter_errors" class="filter_button">
+            <i class="fa-solid fa-filter"></i> Filtros
+        </button>
+        <button id="search" class="ok_button">
+            <i class="fa-solid fa-bars-staggered"></i> Pesquisar
+        </button>
+    </section>
+    <section id="table_errors" class="tabela">
+        <div class="tabela_header">
+            <div class="tabela_counter">
+                #
+            </div>
+            <div class="tabela_buttons">
+                <div id="search_creator">
+                    <input placeholder="Procurar autor" type="text" name="" id="search_creator_input">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <button id="last_edit">
+                  <i class="fa-solid fa-arrow-down"></i> Última Alteração
+                </button>
+                <button id="date_creation">
+                    <i class="fa-solid fa-arrow-up"></i> Data Criação
+                </button>
+                <select name="select_status_filter" id="select_status_filter" style="background: green; color: white;">
+                    <option value="finalizado">FINALIZADO</option>
+                </select>
+                <select name="select_status_filter" id="select_status_filter" style="background: red; color: white;">
+                    <option value="error">ERROR</option>
+                </select>
+            </div>
+        </div>
+        <div class="tabela_body">
+           
+        </div>
+
+    </section>
+</section>
+            <script src="./js/home.js"></script>
