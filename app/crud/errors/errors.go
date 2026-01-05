@@ -79,7 +79,8 @@ func GetErrorsByAppId(appId int) (error, []ErrorSaved) {
   e.how_to_reproduce,
   e.error_occurred_in,
   t.tags,
-  u.name as creator_name
+  u.name as creator_name,
+  f.files
 FROM
   errors e
   LEFT JOIN (
@@ -108,6 +109,9 @@ FROM
       et.id_errors
   ) t ON t.id_errors = e.id
 	LEFT JOIN users u ON u.id = e.creator_id
+	left join (select ef.id_errors ,jsonb_agg (
+  ef.file_name
+  ) as files FROM public.errors_files AS ef group by ef.id_errors) f on f.id_errors = e.id
 WHERE
   e.id_apps = $1 ORDER BY e.id DESC`, appId)
 	var errorsRecovereds []ErrorSaved
@@ -115,10 +119,11 @@ WHERE
 		defer rows.Close()
 		for rows.Next() {
 			var tagsJSON []byte
+			var filesJSON []byte
 			var errorSelected ErrorSaved
 			err = rows.Scan(&errorSelected.Id, &errorSelected.Id_apps, &errorSelected.Message, &errorSelected.Title, &errorSelected.Verified,
 				&errorSelected.Error_level, &errorSelected.Creator_id, &errorSelected.Created_in, &errorSelected.Last_edited_in,
-				&errorSelected.How_to_reproduce, &errorSelected.Error_occurred_in, &tagsJSON, &errorSelected.Creator_name)
+				&errorSelected.How_to_reproduce, &errorSelected.Error_occurred_in, &tagsJSON, &errorSelected.Creator_name, &filesJSON)
 			if err == nil {
 				if len(tagsJSON) > 0 {
 					var tags []Tags.TagSaved
@@ -126,6 +131,13 @@ WHERE
 						return err, nil
 					}
 					errorSelected.Tags = &tags
+				}
+				if len(filesJSON) > 0 {
+					var files []string
+					if err := json.Unmarshal(filesJSON, &files); err != nil {
+						return err, nil
+					}
+					errorSelected.Files = &files
 				}
 				errorsRecovereds = append(errorsRecovereds, errorSelected)
 			}

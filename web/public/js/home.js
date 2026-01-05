@@ -35,7 +35,7 @@ function loadErrorsInTable(data) {
     $('.tabela_counter').html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
 
     for (const e of data) {
-        $('.tabela_body').append(`    <div class="error_row">
+        $('.tabela_body').append(`<div class="error_row">
                 <div class="status_column">
                   ${e.verified ? `  <div  class="status_icon_success">
              <i class="fa-solid fa-circle-check"></i>
@@ -48,7 +48,7 @@ function loadErrorsInTable(data) {
                        ${e.title}
                     </span>
                     <p class="error_description">
-                        ${e.message}
+                       Criado por : ${e.creator_name} às ${formatDate(e.created_in)}
                     </p>
                     <div class="error_tags">
                     ${e.tags ? e.tags.map(f => {
@@ -65,17 +65,17 @@ function loadErrorsInTable(data) {
                         <span class="error_id">#${e.id}</span>
                         <div class="date_infos">
                             <span>
-                               <i class="fa-solid fa-clock"></i> ${formatDate(e.created_in)}
+                               <i class="fa-solid fa-clock" title = "O erro ocorreu nesse horário"></i> ${formatDate(e.error_occurred_in)}
 
                             </span>
                             <span>
-                                <i class="fa-solid fa-arrows-spin"></i> ${formatDate(e.last_edited_in)}
+                                <i class="fa-solid fa-arrows-spin" title = "Última edição no erro"></i> ${formatDate(e.last_edited_in)}
 
                             </span>
                         </div>
                     </div>
                     <div class="infos_columns_files_row">
-                        <i class="fa-solid fa-images"></i> ${e.files_count || 0} arquivo(s) anexado(s)
+                      <i class="fa-solid fa-images"></i> ${e.files?.length || 0} arquivo(s) anexado(s)
                     </div>
                 </div>
             </div>`)
