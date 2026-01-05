@@ -8,6 +8,7 @@
   --gray: #9E9E9E;
   --green: #238636;
   --red: red;
+  --orange: #ec6b00;
   --dark-blue: #00117D;
   --blue: #004192;
   --dark-gray: #5C5A5A;
@@ -290,7 +291,7 @@ html {
   font-weight: bold;
   padding: 0 1rem;
   background: var(--gray);
-  color: white;
+  color: #d0d0d0;
 }
 
 
@@ -343,8 +344,8 @@ display: flex;
   justify-content: center;
 }
 .status_icon_error i {
-font-size: 1.1rem;
-  color: var(--red);
+font-size: 1rem;
+  color: var(--orange);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -355,8 +356,8 @@ display: flex;
   height: 1.625rem;
   align-items: center;
   justify-content: center;
-  border-radius: 15%;
-  border: 3px solid var(--red);
+  border-radius: 50%;
+  border: 3px solid var(--orange);
   cursor: pointer;
 }
 .error_row {
@@ -436,4 +437,11 @@ color: var(--dark-gray);
   border: 1px solid var(--gray);
   border-radius: 0 0 5px 5px;
   overflow: scroll;
+}
+.tabela_buttons button.using {
+  background: var(--darker-gray);
+  color: white;
+}
+#select_tag_filter,#select_status_filter {
+  color: white;
 }

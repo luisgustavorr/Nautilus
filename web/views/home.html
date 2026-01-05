@@ -17,25 +17,28 @@
     <section id="table_errors" class="tabela">
         <div class="tabela_header">
             <div class="tabela_counter">
-                #
+             <i class="fa-solid fa-spinner fa-spin-pulse"></i>
             </div>
             <div class="tabela_buttons">
                 <div id="search_creator">
-                    <input placeholder="Procurar autor" type="text" name="" id="search_creator_input">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input onenter placeholder="Procurar autor" type="text" name="" id="search_creator_input">
+                    <i onclick="filterErrors(lastErrorsRecovered)" class="fa-solid fa-magnifying-glass"></i>
                 </div>
-                <button id="last_edit">
-                  <i class="fa-solid fa-arrow-down"></i> Última Alteração
-                </button>
-                <button id="date_creation">
-                    <i class="fa-solid fa-arrow-up"></i> Data Criação
-                </button>
-                <select name="select_status_filter" id="select_status_filter" style="background: green; color: white;">
-                    <option value="finalizado">FINALIZADO</option>
+              
+                <select onchange="filterErrors(lastErrorsRecovered)" name="select_status_filter" id="select_status_filter">
+                    <option value="" selected> STATUS</option>
+                    <option value="1">VERIFICADO</option>
+                    <option value="0">PENDENTE</option>
                 </select>
-                <select name="select_status_filter" id="select_status_filter" style="background: red; color: white;">
-                    <option value="error">ERROR</option>
+                <select onchange="filterErrors(lastErrorsRecovered)" name="select_tag_filter" id="select_tag_filter" >
+                    <option value="" selected> TAG</option>
                 </select>
+                  <button id="last_edit"  data-value="0"  onclick="BooleanButton(this,'date_order')" class="date_order">
+                  <i class="fa-solid fa-arrow-up"></i> Última Alteração
+                </button>
+                <button id="date_creation"  data-value="0" onclick="BooleanButton(this,'date_order')" class="date_order using">
+               <i class="fa-solid fa-arrow-up"></i> Data Criação
+                </button>
             </div>
         </div>
         <div class="tabela_body">

@@ -1,19 +1,46 @@
-$(document).ready(function () {
-    fetch('/get_errors/1', {
-        method: 'GET',
-        headers: {
-            'Authorization': 'Bearer '
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            for (const e of data) {
-                $('.tabela_body').append(`    <div class="error_row">
+let lastErrorsRecovered = []
+let tags = []
+
+fetch('/get_error_tags/1', {
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer '
+    }
+})
+    .then(response => response.json())
+    .then(data => {
+        tags = data
+        $('#select_tag_filter').html(`
+                            <option value=""selected> TAG</option>
+                   ${tags.map(f => {
+            return ` <option value="${f.id}">${f.name}</option>`
+        }).join("")}
+                `)
+    });
+$('#last_edit,#date_creation').data('val', "1")
+fetch('/get_errors/1', {
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer '
+    }
+})
+    .then(response => response.json())
+    .then(data => {
+        lastErrorsRecovered = data
+        loadErrorsInTable(data)
+    });
+
+function loadErrorsInTable(data) {
+    $('.tabela_body').html("")
+    $('.tabela_counter').html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
+
+    for (const e of data) {
+        $('.tabela_body').append(`    <div class="error_row">
                 <div class="status_column">
                   ${e.verified ? `  <div  class="status_icon_success">
              <i class="fa-solid fa-circle-check"></i>
                     </div>` : `  <div  class="status_icon_error">
-<i class="fa-solid fa-square-xmark"></i>
+<i class="fa-solid fa-clock"></i>
                     </div>`}
                 </div>
                 <div class="main_column">
@@ -24,15 +51,13 @@ $(document).ready(function () {
                         ${e.message}
                     </p>
                     <div class="error_tags">
-                        <div class="tag" style="color: white;background: blue;">
-                            teste texto muito maior q o outro
-                        </div>
-                        <div class="tag" style="color: white;background: orange;">
-                            I.A
-                        </div>
-                        <div class="tag" style="color: white;background: red;">
-                            ERROR
-                        </div>
+                    ${e.tags ? e.tags.map(f => {
+            return ` <div class="tag" style="color: ${f.color};background: ${f.background};" title="${f.description}">
+                            ${f.name}
+                        </div>`
+        }) : ``}
+                       
+                       
                     </div>
                 </div>
                 <div class="infos_column">
@@ -50,12 +75,85 @@ $(document).ready(function () {
                         </div>
                     </div>
                     <div class="infos_columns_files_row">
-                        <i class="fa-solid fa-images"></i> ${e.files_count ||0} arquivo(s) anexado(s)
+                        <i class="fa-solid fa-images"></i> ${e.files_count || 0} arquivo(s) anexado(s)
                     </div>
                 </div>
-
-
             </div>`)
-            }
-        });
+    }
+    $('.tabela_counter').html(data.length == 0 ? '#' : data.length)
+
+}
+$('#search_creator_input').on( "keyup", function(e) {
+  if (e.keyCode == 13){
+	filterErrors(lastErrorsRecovered)
+  }
+} );
+function filterErrors(errors) {
+  console.log('Filtrando')
+  if ($('#select_status_filter').val() != "") {
+    console.log('Por status')
+    let verificado = $('#select_status_filter').val() == "1"
+    if (verificado) {
+      $('#select_status_filter').css({
+        "background": "green"
+      })
+    } else {
+      $('#select_status_filter').css({
+        "background": "red"
+      })
+    }
+    errors = errors.filter(e => {
+      return e.verified == verificado
+    })
+
+  } else {
+    $('#select_status_filter').removeAttr('style')
+  }
+  if ($('#select_tag_filter').val() != "") {
+    let selectedTag = tags.filter(e => e.id == $('#select_tag_filter').val())[0]
+    $('#select_tag_filter').css({
+      "color": selectedTag.color,
+      "background": selectedTag.background
+    })
+    errors = errors.filter(e => {
+      if (e.tags == undefined) return false
+      return e.tags.map(f => f.id).includes(parseInt($('#select_tag_filter').val()))
+    })
+
+  } else {
+    $('#select_tag_filter').removeAttr('style')
+  }
+  if ($('#search_creator_input').val() != "") {
+    console.log('Por nome')
+    let termoDeBusca = $('#search_creator_input').val()
+    errors = errors.filter(obj => removerAcentos(obj["creator_name"]).toLowerCase().includes(removerAcentos(termoDeBusca).toLowerCase()));
+  }
+  let multiplier = parseInt($('.date_order.using').data('val')) == 1 ? 1 : -1
+  if ($('.date_order.using').attr('id') == 'last_edit') {
+    errors.sort((a, b) => {
+      if (moment(moment(a.last_edited_in).format()).diff(moment(moment(b.last_edited_in).format()), 'hours') > 0) {
+        return 1 * multiplier
+      } else if (moment(moment(a.last_edited_in).format()).diff(moment(moment(b.last_edited_in).format()), 'hours') < 0) {
+        return -1 * multiplier
+      } else {
+        return 0
+      }
+    })
+  } else {
+    errors.sort((a, b) => {
+      if (moment(moment(a.created_in).format()).diff(moment(moment(b.created_in).format()), 'hours') > 0) {
+        return 1 * multiplier
+      } else if (moment(moment(a.created_in).format()).diff(moment(moment(b.created_in).format()), 'hours') < 0) {
+        return -1 * multiplier
+      } else {
+        return 0
+      }
+    })
+  }
+  loadErrorsInTable(errors)
+
+}
+filterErrors(lastErrorsRecovered)
+$('#last_edit,#date_creation').click(function(){
+    filterErrors(lastErrorsRecovered)
 })

@@ -6,20 +6,22 @@ import (
 )
 
 type ErrorSaved struct {
-	Id                *int             `json:"id"`
-	Id_apps           int              `json:"id_apps"`
-	Message           string           `json:"message"`
-	Title             string           `json:"title"`
-	Verified          bool             `json:"verified"`
-	Error_level       int              `json:"error_level"`
-	Creator_id        int              `json:"creator_id"`
-	Created_in        time.Time        `json:"created_in"`
-	Last_edited_in    time.Time        `json:"last_edited_in"`
-	How_to_reproduce  string           `json:"how_to_reproduce"`
-	Error_occurred_in time.Time        `json:"error_occurred_in"`
-	Files_count       *int             `json:"files_count"`
-	Files             *[]string        `json:"files"`
-	Tags              *[]Tags.TagSaved `json:"tags"`
+	Id                *int      `json:"id"`
+	Id_apps           int       `json:"id_apps"`
+	Message           string    `json:"message"`
+	Title             string    `json:"title"`
+	Verified          bool      `json:"verified"`
+	Error_level       int       `json:"error_level"`
+	Creator_id        int       `json:"creator_id"`
+	Created_in        time.Time `json:"created_in"`
+	Last_edited_in    time.Time `json:"last_edited_in"`
+	How_to_reproduce  string    `json:"how_to_reproduce"`
+	Error_occurred_in time.Time `json:"error_occurred_in"`
+	//not native, recovered via QUERIES
+	Files_count  *int             `json:"files_count"`
+	Files        *[]string        `json:"files"`
+	Tags         *[]Tags.TagSaved `json:"tags"`
+	Creator_name string           `json:"creator_name"`
 }
 
 func NewErrorToSave(appID int, creatorID int, title string, message string, opts ...func(*ErrorSaved)) *ErrorSaved {

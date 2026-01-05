@@ -3,6 +3,7 @@ package Nautilus
 import (
 	Apps "Nautilus/app/crud/apps"
 	Errors "Nautilus/app/crud/errors"
+	Tags "Nautilus/app/crud/tags"
 	Users "Nautilus/app/crud/users"
 	General "Nautilus/general"
 	"log"
@@ -52,6 +53,16 @@ func Start() {
 		bindInfos["user_profile_picture"] = user.Profile_picture
 		bindInfos["app_name"] = app.Name
 		return c.Render("home", bindInfos)
+	})
+	app.Get("/get_error_tags/:app_id", func(c *fiber.Ctx) error {
+		app_id := c.Params("app_id")
+		err, errors := Tags.GetErrorTagsByAppId(General.ToInt(app_id))
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{
+				"Error": err.Error(),
+			})
+		}
+		return c.JSON(errors)
 	})
 	app.Get("/get_errors/:app_id", func(c *fiber.Ctx) error {
 		app_id := c.Params("app_id")
