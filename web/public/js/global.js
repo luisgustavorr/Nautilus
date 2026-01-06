@@ -6,7 +6,6 @@ if (BindInfos != undefined) {
         $('#profile_picture').html(`<img src="./images/uploaded/profile_pictures/user_1/picture.png" alt="avatar">`)
 
     }
-
 }
 function removerAcentos(str) {
     const tabelaSubstituicao = {
@@ -26,6 +25,54 @@ function removerAcentos(str) {
 function formatDate(unformattedDate) {
     let formattedDate = moment(unformattedDate).format('DD/MM/YYYY kk:mm')
     return formattedDate
+}
+function alertar(title, texto, width = window.outerWidth > 600 ? "500px" : "90%", buttons, type) {
+
+  let buttons_obj = buttons !== undefined ? buttons : {
+    OK: {
+      btnClass: 'btn-blue',
+      action: function () {
+        return
+      }
+    }
+  }
+  return $.confirm({
+    title: title,
+    content: texto,
+    boxWidth: width,
+    useBootstrap: false,
+    type: type || undefined,
+    buttons: buttons_obj
+  });
+}
+async function confirm(title, text, button, btnClass = "btn-red", confirmFunction = undefined, argsFuncions = [], width = 500, cancelarButton = undefined) {
+  const confirmado = new Promise((resolve, reject) => {
+    $.confirm({
+      title: title,
+      typeAnimated: true,
+      content: text,
+      boxWidth: width + 'px',
+      useBootstrap: false,
+      buttons: {
+        tryAgain: {
+          text: button,
+          btnClass: btnClass,
+          action: function () {
+            if (confirmFunction != undefined) {
+              confirmFunction(...argsFuncions)
+            }
+            resolve(true)
+          }
+        },
+        cancelar: cancelarButton == undefined ? function () {
+          resolve(false)
+
+        } : cancelarButton
+      }
+    });
+
+  })
+  return await confirmado.then()
 }
 function BooleanButton(button, uniqueClass) {
     if (uniqueClass != "") {

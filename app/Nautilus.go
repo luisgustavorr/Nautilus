@@ -6,6 +6,7 @@ import (
 	Tags "Nautilus/app/crud/tags"
 	Users "Nautilus/app/crud/users"
 	General "Nautilus/general"
+	"fmt"
 	"log"
 	"time"
 
@@ -53,6 +54,40 @@ func Start() {
 		bindInfos["user_profile_picture"] = user.Profile_picture
 		bindInfos["app_name"] = app.Name
 		return c.Render("home", bindInfos)
+	})
+	app.Get("/error_:error_id?", func(c *fiber.Ctx) error {
+		error_id := c.Params("error_id")
+		fmt.Println(error_id)
+		if error_id == "" {
+			return c.Redirect("/")
+		}
+		err, users := Users.GetUsers(General.ToInt(c.Cookies("user")))
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{"Error": err.Error()})
+		}
+		if len(users) != 1 {
+			return c.Status(500).JSON(map[string]interface{}{"Error": "tem algo de errado com o seu login, contate o suporte"})
+		}
+		user := users[0]
+		err, apps := Apps.GetApp(user.Id_apps)
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{"Error": err.Error()})
+		}
+		if len(apps) != 1 {
+			return c.Status(500).JSON(map[string]interface{}{"Error": "tem algo de errado com o seu login, contate o suporte, apperr"})
+		}
+		app := apps[0]
+		err, savedError := Errors.GetErrors(General.ToInt(error_id))
+		if len(savedError) == 0 {
+			return c.Status(500).JSON(map[string]interface{}{"Error": fmt.Sprintf("O erro %s não existe", error_id)})
+
+		}
+		bindInfos := General.CreateBindInfos("home")
+		bindInfos["user_name"] = user.Name
+		bindInfos["user_profile_picture"] = user.Profile_picture
+		bindInfos["app_name"] = app.Name
+		bindInfos["selected_error"] = savedError[0]
+		return c.Render("errors", bindInfos)
 	})
 	app.Get("/get_error_tags/:app_id", func(c *fiber.Ctx) error {
 		app_id := c.Params("app_id")

@@ -44,18 +44,79 @@ func AddError(errorToSave ErrorSaved) (error, int) {
 func GetErrors(errorId int) (error, []ErrorSaved) {
 	filter := ""
 	if errorId != 0 {
-		filter = fmt.Sprintf("WHERE id = %d", errorId)
+		filter = fmt.Sprintf("WHERE e.id = %d", errorId)
 	}
-	rows, err := General.DB.Query(fmt.Sprintf("SELECT id,id_apps,message,title,verified,error_level,creator_id,created_in,last_edited_in,how_to_reproduce,error_occurred_in FROM errors %s", filter))
+	rows, err := General.DB.Query(fmt.Sprintf(`SELECT
+  e.id,
+  e.id_apps,
+  e.message,
+  e.title,
+  e.verified,
+  e.error_level,
+  e.creator_id,
+  e.created_in,
+  e.last_edited_in,
+  e.how_to_reproduce,
+  e.error_occurred_in,
+  t.tags,
+  u.name as creator_name,
+  f.files
+FROM
+  errors e
+  LEFT JOIN (
+    SELECT
+      et.id_errors,
+      jsonb_agg (
+        json_build_object (
+          'id',
+          t.id,
+          'id_apps',
+          t.id_apps,
+          'name',
+          t."name",
+          'description',
+          t.description,
+          'color',
+          t.color,
+		    'background',
+          t.background
+        )
+      ) AS tags
+    FROM
+      errors_tags et
+      LEFT JOIN tags t ON t.id = et.id_tags
+    GROUP BY
+      et.id_errors
+  ) t ON t.id_errors = e.id
+	LEFT JOIN users u ON u.id = e.creator_id
+	left join (select ef.id_errors ,jsonb_agg (
+  ef.file_name
+  ) as files FROM public.errors_files AS ef group by ef.id_errors) f on f.id_errors = e.id %s ORDER BY e.id DESC`, filter))
 	var errorsRecovereds []ErrorSaved
 	if err == nil {
 		defer rows.Close()
 		for rows.Next() {
+			var tagsJSON []byte
+			var filesJSON []byte
 			var errorSelected ErrorSaved
 			err = rows.Scan(&errorSelected.Id, &errorSelected.Id_apps, &errorSelected.Message, &errorSelected.Title, &errorSelected.Verified,
 				&errorSelected.Error_level, &errorSelected.Creator_id, &errorSelected.Created_in, &errorSelected.Last_edited_in,
-				&errorSelected.How_to_reproduce, &errorSelected.Error_occurred_in)
+				&errorSelected.How_to_reproduce, &errorSelected.Error_occurred_in, &tagsJSON, &errorSelected.Creator_name, &filesJSON)
 			if err == nil {
+				if len(tagsJSON) > 0 {
+					var tags []Tags.TagSaved
+					if err := json.Unmarshal(tagsJSON, &tags); err != nil {
+						return err, nil
+					}
+					errorSelected.Tags = &tags
+				}
+				if len(filesJSON) > 0 {
+					var files []string
+					if err := json.Unmarshal(filesJSON, &files); err != nil {
+						return err, nil
+					}
+					errorSelected.Files = &files
+				}
 				errorsRecovereds = append(errorsRecovereds, errorSelected)
 			}
 		}

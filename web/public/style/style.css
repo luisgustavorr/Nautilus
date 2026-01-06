@@ -375,6 +375,9 @@ display: flex;
 }
 .main_column .error_title {
   font-size: 1.1rem;
+  color: var(--darker-gray) !important;
+  text-decoration: none;
+  font-weight: 600;
 }
 .main_column .error_description {
   font-size: 0.9rem;
@@ -422,6 +425,7 @@ color: var(--dark-gray);
   font-size: 1.2rem;
 }
 .infos_columns_files_row {
+  cursor: pointer;
   width: fit-content;
 }
 .status_column {

@@ -44,9 +44,9 @@ function loadErrorsInTable(data) {
                     </div>`}
                 </div>
                 <div class="main_column">
-                    <span class="error_title">
+                    <a class="error_title" href="/error_${e.id}">
                        ${e.title}
-                    </span>
+                    </a>
                     <p class="error_description">
                        Criado por : ${e.creator_name} às ${formatDate(e.created_in)}
                     </p>
@@ -55,7 +55,7 @@ function loadErrorsInTable(data) {
             return ` <div class="tag" style="color: ${f.color};background: ${f.background};" title="${f.description}">
                             ${f.name}
                         </div>`
-        }) : ``}
+        }).join('') : ``}
                        
                        
                     </div>
@@ -74,7 +74,7 @@ function loadErrorsInTable(data) {
                             </span>
                         </div>
                     </div>
-                    <div class="infos_columns_files_row">
+                    <div class="infos_columns_files_row" id_error="${e.id}" >
                       <i class="fa-solid fa-images"></i> ${e.files?.length || 0} arquivo(s) anexado(s)
                     </div>
                 </div>
@@ -156,4 +156,14 @@ function filterErrors(errors) {
 filterErrors(lastErrorsRecovered)
 $('#last_edit,#date_creation').click(function(){
     filterErrors(lastErrorsRecovered)
+})
+$('body').on('click','.infos_columns_files_row',function(){
+	let id = $(this).attr('id_error')
+  let error = lastErrorsRecovered.find(e=>e.id == parseInt(id))
+  console.log(error)
+  if (error.files == undefined || error.files.length == 0) {
+		alertar("Opa","Esse erro não possui anexos")
+    return
+  }
+    new browse(error.files, `/images/uploaded/error_files/error_${error.id}/`)
 })

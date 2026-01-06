@@ -254,7 +254,7 @@ class browse {
         }
         $("#filesBrowser").remove()
         $("fundo").css("display","flex")
-        $("#dashboard_body").append(`
+        $("body").append(`
                   <div id="filesBrowser">
                   <div id="close">
                   <i class="fa-solid fa-xmark"></i>
