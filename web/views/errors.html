@@ -1,5 +1,160 @@
 {{template "partials/header" .}}
 {{template "partials/sidebar" .}}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.snow.css" rel="stylesheet" />
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.js"></script>
+
 <section id="body_wrapper">
-    tela de erro xd
+    <div id="error_infos">
+        <div id="error_infos_title">
+            <h3>Randomly and unexpected tag/mention IOS user <span>#30</span></h3>
+            <button><i class="fa-solid fa-check"></i> FINALIZAR</button>
+        </div>
+        <div id="error_infos_subtitle">
+            <div id="error_infos_status_and_tags">
+                <div id="error_infos_status">
+                    <i class="fa-solid fa-clock"></i> Pendente
+                </div>
+                <div id="error_infos_tags">
+                    <div class="tag" style="color: white; background: red;">
+                        Error tag
+                    </div>
+                </div>
+            </div>
+            <span id="error_infos_date_creation">
+                10/02/2026 10:30
+            </span>
+        </div>
+
+    </div>
+    <div id="error_comments_part">
+        <div id="error_comments">
+            <div class="error_comment_parent">
+                <div class="error_comment_perfil_image">
+
+                </div>
+                <div class="error_comment">
+                    <div class="error_comment_header">
+                        <div class="error_comment_header_text">
+                            <h5>João Marcus</h5>
+                            <p>10 Nov 2026 10:30PM</p>
+                        </div>
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                    <div class="error_comment_body"></div>
+                </div>
+
+            </div>
+            <div class="error_comment_splitter"></div>
+            <div class="error_comment_parent">
+                <div class="error_comment_perfil_image">
+
+                </div>
+                <div class="error_comment">
+                    <div class="error_comment_header">
+                        <div class="error_comment_header_text">
+                            <h5>Luís Gustavo</h5>
+                            <p>13 Nov 2026 10:30PM</p>
+                        </div>
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                    <div class="error_comment_body"></div>
+                </div>
+            </div>
+        </div>
+        <div id="error_summary_part">
+            <div id="error_summary">
+                <div id="error_summary_header">
+                    <h3>RESUMO</h3>
+                </div>
+                <div id="error_summary_body">
+                    <div class="error_summary_row">
+                        <div class="error_summary_row_writer_name">
+                            <span>Luís Gustavo</span>
+                        </div>
+                        <div class="error_summary_row_message">
+                            <i class="fa-solid fa-turn-up"></i>
+                            <p>Ainda estou verificando, por enquanto só evita a tela X e Y</p>
+                        </div>
+                        <div class="error_summary_row_date">
+                            01/07/2006 10:30
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="add_comment_part">
+        <div id="add_comment_header">
+            <div class="error_comment_perfil_image">
+
+            </div>
+            <h4>Adicione um comentário</h4>
+        </div>
+        <div id="editor_father">
+            <div id="toolbar">
+                <span style="border-left: none;" class="ql-formats">
+                    <select title="Fonte Usada" class="option_class ql-font"></select>
+                    <select title="Tamanho Fonte" id="tamanho_fonte" class="option_class ql-size">
+                        <option value="normal" selected>Padrão</option>
+                        <option value="small">Pequena</option>
+                        <option value="large">Grande</option>
+                        <option value="huge">Enorme</option>
+                    </select>
+                </span>
+                <span class="ql-formats">
+                    <button title="Negrito" class="option_class ql-bold"></button>
+                    <button title="Itálico" class="option_class ql-italic"></button>
+                    <button title="Underline" class="option_class ql-underline"></button>
+                    <button title="Riscado" class="option_class ql-strike"></button>
+                </span>
+                <span class="ql-formats">
+                    <select title="Cor Texto" class="option_class ql-color"></select>
+                    <select title="Cor Grifado" class="option_class ql-background"></select>
+                </span>
+                <span class="ql-formats">
+                    <button title="Sub Texto" class="option_class ql-script" value="sub"></button>
+                    <button title="Sob Texto" class="option_class ql-script" value="super"></button>
+                </span>
+                <span class="ql-formats">
+                    <button title="Título" class="option_class ql-header" value="1"></button>
+                    <button title="Subtítulo" class="option_class ql-header" value="2"></button>
+                    <button title="Bloco de Citação" class="option_class ql-blockquote"></button>
+                    <!-- <button  title="Bloco de Citação"  class="option_class ql-code-block"></button> -->
+                </span>
+                <span class="ql-formats">
+                    <button title="Lista Numerada" class="option_class ql-list" value="ordered"></button>
+                    <button title="Lista Não Numerada" class="option_class ql-list" value="bullet"></button>
+                    <!-- <button title="Remover Espaçamento" class="option_class ql-indent" value="-1"></button> -->
+                    <!-- <button title="Adicionar Espaçamento" class="option_class ql-indent" value="+1"></button> -->
+                </span>
+                <span class="ql-formats">
+                    <!-- <button title="Alterar Lado da Escrita" class="option_class ql-direction" value="rtl"></button> -->
+                    <select title="Alinhar Texto" class="option_class ql-align"></select>
+                </span>
+                <span class="ql-formats">
+                    <button title="Vincular Link" class="option_class ql-link"></button>
+                    <!-- <button title="Adicionar Imagem" class="option_class ql-image"></button> -->
+                    <!-- <button title="Adicionar Link"class="option_class ql-video"></button> -->
+                    <!-- <button class="option_class ql-formula"></button> -->
+                </span>
+                <span class="ql-formats">
+                    <button title="Limpar Modificações" class="option_class ql-clean"></button>
+                </span>
+                <button id="save_comment"> <i class="fa-regular fa-floppy-disk"></i> SALVAR</button>
+            </div>
+            <div id="editor"></div>
+
+        </div>
+
+    </div>
+    <script>
+        const quill = new Quill("#editor", {
+            modules: {
+                toolbar: "#toolbar",
+            },
+              placeholder: 'Escreva aqui o seu comentário...',
+            theme: "snow",
+        });
+    </script>
 </section>
