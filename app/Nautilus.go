@@ -4,6 +4,7 @@ import (
 	Apps "Nautilus/app/crud/apps"
 	Errors "Nautilus/app/crud/errors"
 	Tags "Nautilus/app/crud/tags"
+	Thoughts "Nautilus/app/crud/thoughts"
 	Users "Nautilus/app/crud/users"
 	General "Nautilus/general"
 	"fmt"
@@ -57,10 +58,12 @@ func Start() {
 	})
 	app.Get("/error_:error_id?", func(c *fiber.Ctx) error {
 		error_id := c.Params("error_id")
+
 		fmt.Println(error_id)
 		if error_id == "" {
 			return c.Redirect("/")
 		}
+		error_id_in_int := General.ToInt(error_id)
 		err, users := Users.GetUsers(General.ToInt(c.Cookies("user")))
 		if err != nil {
 			return c.Status(500).JSON(map[string]interface{}{"Error": err.Error()})
@@ -76,8 +79,9 @@ func Start() {
 		if len(apps) != 1 {
 			return c.Status(500).JSON(map[string]interface{}{"Error": "tem algo de errado com o seu login, contate o suporte, apperr"})
 		}
+
 		app := apps[0]
-		err, savedError := Errors.GetErrors(General.ToInt(error_id))
+		err, savedError := Errors.GetErrors(error_id_in_int)
 		if len(savedError) == 0 {
 			return c.Status(500).JSON(map[string]interface{}{"Error": fmt.Sprintf("O erro %s não existe", error_id)})
 
@@ -98,6 +102,16 @@ func Start() {
 			})
 		}
 		return c.JSON(errors)
+	})
+	app.Get("/get_error_thoughts/:error_id", func(c *fiber.Ctx) error {
+		error_id := c.Params("error_id")
+		err, thoughts := Thoughts.GetThoughtByErrorId(General.ToInt(error_id))
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{
+				"Error": err.Error(),
+			})
+		}
+		return c.JSON(thoughts)
 	})
 	app.Get("/get_errors/:app_id", func(c *fiber.Ctx) error {
 		app_id := c.Params("app_id")

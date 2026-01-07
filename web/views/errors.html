@@ -16,9 +16,7 @@
                     <i class="fa-solid fa-clock"></i> Pendente
                 </div>
                 <div id="error_infos_tags">
-                    <div class="tag" style="color: white; background: red;">
-                        Error tag
-                    </div>
+
                 </div>
             </div>
             <span id="error_infos_date_creation">
@@ -29,37 +27,8 @@
     </div>
     <div id="error_comments_part">
         <div id="error_comments">
-            <div class="error_comment_parent">
-                <div class="error_comment_perfil_image">
-
-                </div>
-                <div class="error_comment">
-                    <div class="error_comment_header">
-                        <div class="error_comment_header_text">
-                            <h5>João Marcus</h5>
-                            <p>10 Nov 2026 10:30PM</p>
-                        </div>
-                        <i class="fa-solid fa-ellipsis"></i>
-                    </div>
-                    <div class="error_comment_body"></div>
-                </div>
-
-            </div>
-            <div class="error_comment_splitter"></div>
-            <div class="error_comment_parent">
-                <div class="error_comment_perfil_image">
-
-                </div>
-                <div class="error_comment">
-                    <div class="error_comment_header">
-                        <div class="error_comment_header_text">
-                            <h5>Luís Gustavo</h5>
-                            <p>13 Nov 2026 10:30PM</p>
-                        </div>
-                        <i class="fa-solid fa-ellipsis"></i>
-                    </div>
-                    <div class="error_comment_body"></div>
-                </div>
+            <div class="loading_spinner">
+                <i class="fa-solid fa-spinner fa-spin-pulse "></i>
             </div>
         </div>
         <div id="error_summary_part">
@@ -68,18 +37,9 @@
                     <h3>RESUMO</h3>
                 </div>
                 <div id="error_summary_body">
-                    <div class="error_summary_row">
-                        <div class="error_summary_row_writer_name">
-                            <span>Luís Gustavo</span>
-                        </div>
-                        <div class="error_summary_row_message">
-                            <i class="fa-solid fa-turn-up"></i>
-                            <p>Ainda estou verificando, por enquanto só evita a tela X e Y</p>
-                        </div>
-                        <div class="error_summary_row_date">
-                            01/07/2006 10:30
-                        </div>
-                    </div>
+   <div class="loading_spinner">
+                <i class="fa-solid fa-spinner fa-spin-pulse "></i>
+            </div>
                 </div>
             </div>
         </div>
@@ -148,13 +108,6 @@
         </div>
 
     </div>
-    <script>
-        const quill = new Quill("#editor", {
-            modules: {
-                toolbar: "#toolbar",
-            },
-              placeholder: 'Escreva aqui o seu comentário...',
-            theme: "snow",
-        });
-    </script>
+    <script src="./js/errors.js"></script>
+
 </section>
