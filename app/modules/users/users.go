@@ -49,3 +49,6 @@ func DeleteUser(userId int) error {
 	_, err := General.DB.Exec("DELETE from users WHERE id = $1", userId)
 	return err
 }
+func GetUserIdByToken(token string) (error, int) {
+	return nil, General.ToInt(token)
+}
