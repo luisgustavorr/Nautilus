@@ -1,14 +1,15 @@
 package Nautilus
 
 import (
-	Apps "Nautilus/app/crud/apps"
-	Errors "Nautilus/app/crud/errors"
-	Tags "Nautilus/app/crud/tags"
-	Thoughts "Nautilus/app/crud/thoughts"
-	Users "Nautilus/app/crud/users"
+	Apps "Nautilus/app/modules/apps"
+	Errors "Nautilus/app/modules/errors"
+	Tags "Nautilus/app/modules/tags"
+	Thoughts "Nautilus/app/modules/thoughts"
+	Users "Nautilus/app/modules/users"
 	General "Nautilus/general"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -32,9 +33,42 @@ func Start() {
 		Views:        engine,
 	})
 	app.Static("/", "./web/public/")
-
+	app.Post("/add_thought", func(c *fiber.Ctx) error {
+		err, creatorId := Users.GetUserIdByToken(c.Cookies("user"))
+		if err != nil {
+			return c.Status(200).JSON(map[string]interface{}{
+				"status":  500,
+				"message": "Erro com o seu usuário, entre em contato com o suporte",
+			})
+		}
+		var thoughtStructed Thoughts.ThoughtSaved
+		if err := c.BodyParser(&thoughtStructed); err != nil {
+			fmt.Println(err)
+			return fiber.NewError(fiber.StatusBadRequest, "Invalid JSON body")
+		}
+		// err = json.Unmarshal([]byte(thought), thoughtStructed)
+		if err != nil {
+			fmt.Errorf(err.Error())
+			return c.Status(200).JSON(map[string]interface{}{
+				"status":  500,
+				"message": "Erro ao processar Objeto, entre em contato com o suporte",
+			})
+		}
+		thoughtStructed.Creator_id = creatorId
+		fmt.Println(General.JsonViewInterface(thoughtStructed), creatorId)
+		Thoughts.AddTought(thoughtStructed)
+		return c.Status(200).JSON(map[string]interface{}{
+			"status":  200,
+			"message": "Seu comentário foi adicionado !",
+		})
+	})
 	app.Get("/", func(c *fiber.Ctx) error {
-		err, users := Users.GetUsers(General.ToInt(c.Cookies("user")))
+		userId := c.Cookies("user")
+		if userId == "" {
+			userId = os.Getenv("USER_ID")
+		}
+		fmt.Println(userId)
+		err, users := Users.GetUsers(General.ToInt(userId))
 		if err != nil {
 			return c.Status(500).JSON(map[string]interface{}{"Error": err.Error()})
 		}
@@ -86,11 +120,19 @@ func Start() {
 			return c.Status(500).JSON(map[string]interface{}{"Error": fmt.Sprintf("O erro %s não existe", error_id)})
 
 		}
+		errorId := c.Params("error_id")
+		err, thoughts := Thoughts.GetThoughtByErrorId(General.ToInt(errorId))
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{
+				"Error": err.Error(),
+			})
+		}
 		bindInfos := General.CreateBindInfos("home")
 		bindInfos["user_name"] = user.Name
 		bindInfos["user_profile_picture"] = user.Profile_picture
 		bindInfos["app_name"] = app.Name
 		bindInfos["selected_error"] = savedError[0]
+		bindInfos["thoughts"] = thoughts
 		return c.Render("errors", bindInfos)
 	})
 	app.Get("/get_error_tags/:app_id", func(c *fiber.Ctx) error {
@@ -104,8 +146,8 @@ func Start() {
 		return c.JSON(errors)
 	})
 	app.Get("/get_error_thoughts/:error_id", func(c *fiber.Ctx) error {
-		error_id := c.Params("error_id")
-		err, thoughts := Thoughts.GetThoughtByErrorId(General.ToInt(error_id))
+		errorId := c.Params("error_id")
+		err, thoughts := Thoughts.GetThoughtByErrorId(General.ToInt(errorId))
 		if err != nil {
 			return c.Status(500).JSON(map[string]interface{}{
 				"Error": err.Error(),
@@ -114,14 +156,14 @@ func Start() {
 		return c.JSON(thoughts)
 	})
 	app.Get("/get_errors/:app_id", func(c *fiber.Ctx) error {
-		app_id := c.Params("app_id")
-		err, errors := Errors.GetErrorsByAppId(General.ToInt(app_id))
+		appId := c.Params("app_id")
+		err, errors := Errors.GetErrorsByAppId(General.ToInt(appId))
 		if err != nil {
 			return c.Status(500).JSON(map[string]interface{}{
 				"Error": err.Error(),
 			})
 		}
-		return c.JSON(errors)
+		return c.Render(General.SubPartialsPath("errors", "errors_table"), errors)
 	})
 	log.Fatal(app.Listen(":3120"))
 }

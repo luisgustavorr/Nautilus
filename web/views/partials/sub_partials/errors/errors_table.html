@@ -1,3 +1,4 @@
+{{range .}}
 <div class="error_row">
     <div class="status_column">
         <div class="status_icon_error">
@@ -5,29 +6,39 @@
         </div>
     </div>
     <div class="main_column">
-        <a class="error_title" href="/error_47">
-            Teste
+        <a class="error_title" href="/error_{{.Id}}">
+            {{.Title}}
         </a>
         <p class="error_description">
-            SUB PARTIAL Criado por : Luís às 07/01/2026 14:42
+            Criado por: {{.Creator_name}} às
+            <format-date>{{.Created_in}}</format-date>
         </p>
         <div class="error_tags">
+            {{if .Tags}}
+            {{range .Tags}}
+            <div class="tag" style="color:{{.Color}};background: {{.Background}};" title="{{.Description}}">
+                {{.Name}}
+            </div>
+            {{end}}
+            {{end}}
         </div>
     </div>
     <div class="infos_column">
         <div class="infos_column_first_row">
-            <span class="error_id">#47</span>
+            <span class="error_id">#{{.Id}}</span>
             <div class="date_infos">
                             <span>
-                               <i class="fa-solid fa-clock" title="O erro ocorreu nesse horário"></i> 07/01/2026 14:42
+                                <i class="fa-solid fa-clock" title="O erro ocorreu nesse horário"></i> <format-date>{{.Error_occurred_in}}</format-date>
                             </span>
                 <span>
-                                <i class="fa-solid fa-arrows-spin" title="Última edição no erro"></i> 07/01/2026 14:42
+                        <i class="fa-solid fa-arrows-spin" title="Última edição no erro"></i> <format-date>{{.Last_edited_in}}</format-date>
                             </span>
             </div>
         </div>
-        <div class="infos_columns_files_row" data-id_error="47">
-            <i class="fa-solid fa-images"></i> 0 arquivo(s) anexado(s)
+        <div class="infos_columns_files_row" data-id_error="{{.Id}}">
+            <i class="fa-solid fa-images"></i> {{.Files_count}} arquivo(s) anexado(s)
         </div>
     </div>
 </div>
+</div>
+{{end}}

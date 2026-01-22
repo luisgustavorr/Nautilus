@@ -4,11 +4,9 @@ import (
 	Store "Nautilus/store"
 	"database/sql"
 	"log"
-	"sync"
 )
 
 var DB *sql.DB
-var DBMutex sync.Mutex
 
 func Setup() {
 	var err error

@@ -1,6 +1,6 @@
 {{template "partials/header" .}}
 {{template "partials/sidebar" .}}
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.snow.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.snow.css" rel="stylesheet"/>
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.js"></script>
 
@@ -27,9 +27,39 @@
     </div>
     <div id="error_comments_part">
         <div id="error_comments">
-            <div class="loading_spinner">
-                <i class="fa-solid fa-spinner fa-spin-pulse "></i>
+            {{if .thoughts}}
+            {{range .thoughts}}
+            <div class="error_comment_parent">
+                <div class="error_comment_perfil_image">
+                    {{if .Creator_profile_picture}}
+                    <img src="https://api.dicebear.com/9.x/thumbs/svg?seed={{.Creator_name}}&amp;backgroundColor[]&amp;shapeColor=69d2e7,f1f4dc,f88c49" alt="avatar">
+                    {{else}}
+                    <img src="./images/uploaded/profile_pictures/user_{{.Creator_id}}/picture.png" alt="avatar">
+                    {{end}}
+                </div>
+                <div class="error_comment">
+                    <div class="error_comment_header">
+                        <div class="error_comment_header_text">
+                            <h5>{{.Creator_name}}</h5>
+                            <p><format-date-long>{{.Created_in}}</format-date-long></p>
+                        </div>
+                        <div class='actions_parents'>
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <i class="fa-solid fa-paperclip" title="Arquivos anexados"></i>
+                            <i class="fa-solid fa-quote-right quote_comment" title="Responder comentário" data-error_id="${e.id}"></i>
+                        </div>
+                    </div>
+                    <div class="error_comment_body">
+                        ${e.thought}
+                    </div>
+                </div>
+
             </div>
+            {{end}}
+            {{end}}
+            <!--            <div class="loading_spinner">-->
+            <!--                <i class="fa-solid fa-spinner fa-spin-pulse "></i>-->
+            <!--            </div>-->
         </div>
         <div id="error_summary_part">
             <div id="error_summary">
@@ -37,9 +67,9 @@
                     <h3>RESUMO</h3>
                 </div>
                 <div id="error_summary_body">
-   <div class="loading_spinner">
-                <i class="fa-solid fa-spinner fa-spin-pulse "></i>
-            </div>
+                    <div class="loading_spinner">
+                        <i class="fa-solid fa-spinner fa-spin-pulse "></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,7 +83,7 @@
         </div>
         <div id="editor_father">
             <div id="toolbar">
-                <span style="border-left: none;" class="ql-formats">
+                <!-- <span style="border-left: none;" class="ql-formats">
                     <select title="Fonte Usada" class="option_class ql-font"></select>
                     <select title="Tamanho Fonte" id="tamanho_fonte" class="option_class ql-size">
                         <option value="normal" selected>Padrão</option>
@@ -61,7 +91,7 @@
                         <option value="large">Grande</option>
                         <option value="huge">Enorme</option>
                     </select>
-                </span>
+                </span> -->
                 <span class="ql-formats">
                     <button title="Negrito" class="option_class ql-bold"></button>
                     <button title="Itálico" class="option_class ql-italic"></button>
@@ -94,14 +124,17 @@
                 </span>
                 <span class="ql-formats">
                     <button title="Vincular Link" class="option_class ql-link"></button>
+                    <button title="Anexar Arquivo" id="anexar_arquivos_comentario">  <i
+                            class="fa-solid fa-paperclip"></i></button>
                     <!-- <button title="Adicionar Imagem" class="option_class ql-image"></button> -->
                     <!-- <button title="Adicionar Link"class="option_class ql-video"></button> -->
                     <!-- <button class="option_class ql-formula"></button> -->
                 </span>
                 <span class="ql-formats">
-                    <button title="Limpar Modificações" class="option_class ql-clean"></button>
+                    <button class="option_class " title="Limpar Modificações" class="option_class ql-clean"></button>
                 </span>
-                <button id="save_comment"> <i class="fa-regular fa-floppy-disk"></i> SALVAR</button>
+
+                <button id="save_comment"><i class="fa-regular fa-floppy-disk"></i> SALVAR</button>
             </div>
             <div id="editor"></div>
 

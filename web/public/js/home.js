@@ -2,40 +2,41 @@ let lastErrorsRecovered = []
 let tags = []
 
 fetch('/get_error_tags/1', {
-    method: 'GET',
-    headers: {
-        'Authorization': 'Bearer '
-    }
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer '
+  }
 })
-    .then(response => response.json())
-    .then(data => {
-        tags = data
-        $('#select_tag_filter').html(`
+  .then(response => response.json())
+  .then(data => {
+    tags = data
+    $('#select_tag_filter').html(`
                             <option value=""selected> TAG</option>
                    ${tags.map(f => {
-            return ` <option value="${f.id}">${f.name}</option>`
-        }).join("")}
+      return ` <option value="${f.id}">${f.name}</option>`
+    }).join("")}
                 `)
-    });
+  });
 $('#last_edit,#date_creation').data('val', "1")
-fetch('/get_errors/1', {
-    method: 'GET',
-    headers: {
-        'Authorization': 'Bearer '
-    }
-})
-    .then(response => response.json())
-    .then(data => {
-        lastErrorsRecovered = data
-        loadErrorsInTable(data)
-    });
+$.ajax({
+  url: '/get_errors/1',
+  method: 'GET',
+  contentType: 'text/html',
+  success: function (ret) {
+    console.log(ret)
+    $('.tabela_body').html(ret)
 
+  },
+  error: function (err) {
+    console.log(err)
+  }
+});
 function loadErrorsInTable(data) {
-    $('.tabela_body').html("")
-    $('.tabela_counter').html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
+  $('.tabela_body').html("")
+  $('.tabela_counter').html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
 
-    for (const e of data) {
-        $('.tabela_body').append(`<div class="error_row">
+  for (const e of data) {
+    $('.tabela_body').append(`<div class="error_row">
                 <div class="status_column">
                   ${e.verified ? `  <div  class="status_icon_success">
              <i class="fa-solid fa-circle-check"></i>
@@ -52,10 +53,10 @@ function loadErrorsInTable(data) {
                     </p>
                     <div class="error_tags">
                     ${e.tags ? e.tags.map(f => {
-            return ` <div class="tag" style="color: ${f.color};background: ${f.background};" title="${f.description}">
+      return ` <div class="tag" style="color: ${f.color};background: ${f.background};" title="${f.description}">
                             ${f.name}
                         </div>`
-        }).join('') : ``}
+    }).join('') : ``}
                        
                        
                     </div>
@@ -79,15 +80,15 @@ function loadErrorsInTable(data) {
                     </div>
                 </div>
             </div>`)
-    }
-    $('.tabela_counter').html(data.length == 0 ? '#' : data.length)
+  }
+  $('.tabela_counter').html(data.length == 0 ? '#' : data.length)
 
 }
-$('#search_creator_input').on( "keyup", function(e) {
-  if (e.keyCode == 13){
-	filterErrors(lastErrorsRecovered)
+$('#search_creator_input').on("keyup", function (e) {
+  if (e.keyCode == 13) {
+    filterErrors(lastErrorsRecovered)
   }
-} );
+});
 function filterErrors(errors) {
   console.log('Filtrando')
   if ($('#select_status_filter').val() != "") {
@@ -154,16 +155,16 @@ function filterErrors(errors) {
 
 }
 filterErrors(lastErrorsRecovered)
-$('#last_edit,#date_creation').click(function(){
-    filterErrors(lastErrorsRecovered)
+$('#last_edit,#date_creation').click(function () {
+  filterErrors(lastErrorsRecovered)
 })
-$('body').on('click','.infos_columns_files_row',function(){
-	let id = $(this).attr('id_error')
-  let error = lastErrorsRecovered.find(e=>e.id == parseInt(id))
+$('body').on('click', '.infos_columns_files_row', function () {
+  let id = $(this).attr('id_error')
+  let error = lastErrorsRecovered.find(e => e.id == parseInt(id))
   console.log(error)
   if (error.files == undefined || error.files.length == 0) {
-		alertar("Opa","Esse erro não possui anexos")
+    alertar("Opa", "Esse erro não possui anexos")
     return
   }
-    new browse(error.files, `/images/uploaded/error_files/error_${error.id}/`)
+  new browse(error.files, `/images/uploaded/error_files/error_${error.id}/`)
 })

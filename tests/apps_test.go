@@ -1,7 +1,7 @@
 package tests
 
 import (
-	Apps "Nautilus/app/crud/apps"
+	Apps "Nautilus/app/modules/apps"
 	"fmt"
 	"testing"
 )

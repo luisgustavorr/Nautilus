@@ -1,7 +1,7 @@
 package tests
 
 import (
-	Users "Nautilus/app/crud/users"
+	Users "Nautilus/app/modules/users"
 	"testing"
 )
 

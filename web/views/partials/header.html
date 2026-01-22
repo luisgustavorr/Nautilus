@@ -3,44 +3,49 @@
 
 <head>
     <script>const BindInfos = {{.}};</script>
-    <script>document.title = BindInfos.Title</script>
-    <link rel="stylesheet" type="text/css" href="style/style.css" />
-    <link rel="stylesheet" type="text/css" href="style/browseFiles.css" />
-    <link rel="stylesheet" type="text/css" href="style/jquery-confirm.css" />
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" type="text/css" href="style/style.css"/>
+    <link rel="stylesheet" type="text/css" href="style/browseFiles.css"/>
+    <link rel="stylesheet" type="text/css" href="style/jquery-confirm.css"/>
 
-    <link rel="stylesheet" type="text/css" href="style/modal-builder.css" />
-    <link rel="stylesheet" type="text/css" href="style/icons/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="style/modal-builder.css"/>
+    <link rel="stylesheet" type="text/css" href="style/icons/css/all.css"/>
 
 </head>
 
 <body>
-    <header>
-        <div id="header_left_side">
-            <div id="menu">
-                <i class="fa-solid fa-bars"></i>
-            </div>
-            <div id="profile_part">
-                <div id="profile_picture">
-
-                </div>
-                <h3 id="user_project">
-
-                </h3>
-            </div>
+<header>
+    <div id="header_left_side">
+        <div id="menu">
+            <i class="fa-solid fa-bars"></i>
         </div>
-        <div id="header_right_side">
-            <div id="main_search_bar">
-                <input placeholder="Procurar erro/app..." type="text" name="main_search_bar_input"
-                    id="main_search_bar_input">
-                <i class="fa-solid fa-magnifying-glass"></i>
+        <div id="profile_part">
+            <div id="profile_picture">
+                {{if .user_profile_picture}}
+                <img src="./images/uploaded/profile_pictures/user_1/picture.png" alt="avatar">
+                {{else}}
+                <img src="https://api.dicebear.com/9.x/thumbs/svg?seed={{.user_name}}&amp;backgroundColor[]&amp;shapeColor=69d2e7,f1f4dc,f88c49"
+                     alt="avatar">
+                {{end}}
             </div>
+            <h3 id="user_project">
+                {{.user_name}} {{if .app_name}}/ <strong> {{.app_name}}</strong> {{end}}
+            </h3>
         </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"> </script>
-        <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-        <script src="./js/jquery.js"></script>
-        <script src="./js/browseFiles.js"></script>
-        <script src="./js/modal-builder.js"></script>
-        <script src="./js/jquery-confirm.js"></script>
-        <script src="./js/global.js"></script>
+    </div>
+    <div id="header_right_side">
+        <div id="main_search_bar">
+            <input placeholder="Procurar erro/app..." type="text" name="main_search_bar_input"
+                   id="main_search_bar_input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/browseFiles.js"></script>
+    <script src="./js/modal-builder.js"></script>
+    <script src="./js/jquery-confirm.js"></script>
+    <script src="./js/global.js"></script>
 
-    </header>
+</header>

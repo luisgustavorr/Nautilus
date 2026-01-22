@@ -1,7 +1,7 @@
 package Errors
 
 import (
-	Tags "Nautilus/app/crud/tags"
+	Tags "Nautilus/app/modules/tags"
 	General "Nautilus/general"
 	"encoding/json"
 	"fmt"
@@ -116,8 +116,11 @@ FROM
 						return err, nil
 					}
 					errorSelected.Files = &files
+					errorSelected.Files_count = len(files)
+
 				}
 				errorsRecovereds = append(errorsRecovereds, errorSelected)
+
 			}
 		}
 	}
@@ -199,6 +202,7 @@ WHERE
 						return err, nil
 					}
 					errorSelected.Files = &files
+					errorSelected.Files_count = len(files)
 				}
 				errorsRecovereds = append(errorsRecovereds, errorSelected)
 			}

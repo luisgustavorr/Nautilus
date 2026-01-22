@@ -71,7 +71,6 @@ if (BindInfos != undefined) {
         $('#add_comment_header .error_comment_perfil_image').html(`<img src="https://api.dicebear.com/9.x/thumbs/svg?seed=${BindInfos.user_name}&amp;backgroundColor[]&amp;shapeColor=69d2e7,f1f4dc,f88c49" alt="avatar">`)
     } else {
         $('#add_comment_header .error_comment_perfil_image').html(`<img src="./images/uploaded/profile_pictures/user_1/picture.png" alt="avatar">`)
-
     }
 }
 
@@ -86,7 +85,13 @@ if (BindInfos.selected_error != undefined) {
                       ${e.name}
                     </div>`
     }).join('') : ``}`)
-    fetch('/get_error_thoughts/' + err.id, {
+    // getThoughtsFromErrorAndLoad(err.id)
+} else {
+    console.log('Sem id')
+
+}
+function getThoughtsFromErrorAndLoad(err_id) {
+    fetch('/get_error_thoughts/' + err_id, {
         method: 'GET',
         headers: {
             'Authorization': 'Bearer '
@@ -97,10 +102,43 @@ if (BindInfos.selected_error != undefined) {
             toughtsFromError = data
             loadThouhts(data)
         });
-} else {
-    console.log('Sem id')
-
 }
+function createNewThought() {
+    if (BindInfos.selected_error == undefined) {
+        return undefined
+    }
+    let err = BindInfos.selected_error
+    let tought = {
+        id_errors: err.id,
+        thought: quill.getSemanticHTML(),
+        created_in: moment().format(),
+        vinculated_to: 0,
+        files: []
+    }
+
+    return tought
+}
+$("#save_comment").on("click", function (event) {
+    blockLoadingButton($("#save_comment"), true)
+    let tht = createNewThought()
+    $.ajax({
+        url: '/add_thought',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(tht),
+
+        success: function (ret) {
+            QuickStatusAlert(ret.status, ret.message)
+            blockLoadingButton($("#save_comment"), false)
+            getThoughtsFromErrorAndLoad(tht.id_errors)
+        },
+        error: function (err) {
+            QuickStatusAlert(ret.status, ret.message)
+            blockLoadingButton($("#save_comment"), false)
+
+        }
+    });
+})
 $('body').on('click', '.tooltip_opener', function (event) {
     let x = parseFloat(event.pageX) + 10;
     let y = parseFloat(event.pageY) - parseFloat($("header").outerHeight() - 80)
@@ -113,33 +151,33 @@ function moveTooltip(x, y) {
     $("#tooltip_contrato").css("top", y + "px")
 }
 $('body').on('click', '.quote_comment', function () {
-  const id = $(this).data('error_id')
-  const thg = toughtsFromError.find(e => e.id == id)
-
- 
-  const quotedText = $('<div>').html(thg.thought).text()
-
-  quill.setText('')
-
-  let index = 0
+    const id = $(this).data('error_id')
+    const thg = toughtsFromError.find(e => e.id == id)
 
 
-  quill.insertText(index, `${thg.creator_name} :`, { bold: true })
-  index += `${thg.creator_name} :`.length
+    const quotedText = $('<div>').html(thg.thought).text()
+
+    quill.setText('')
+
+    let index = 0
 
 
-  quill.insertText(index, '\n')
-  quill.formatLine(index, 1, 'blockquote', true)
-  index += 1
-  quill.insertText(index, quotedText)
-  quill.formatLine(index, quotedText.length, 'blockquote', true)
-  index += quotedText.length
+    quill.insertText(index, `${thg.creator_name} :`, { bold: true })
+    index += `${thg.creator_name} :`.length
 
- 
-  quill.insertText(index, '\n')
-  quill.formatLine(index, 1, 'blockquote', true)
-  index += 1
-quill.formatLine(index, index+1, 'blockquote', false)
 
-  quill.setSelection(index, 0, 'user')
+    quill.insertText(index, '\n')
+    quill.formatLine(index, 1, 'blockquote', true)
+    index += 1
+    quill.insertText(index, quotedText)
+    quill.formatLine(index, quotedText.length, 'blockquote', true)
+    index += quotedText.length
+
+
+    quill.insertText(index, '\n')
+    quill.formatLine(index, 1, 'blockquote', true)
+    index += 1
+    quill.formatLine(index, index + 1, 'blockquote', false)
+
+    quill.setSelection(index, 0, 'user')
 })

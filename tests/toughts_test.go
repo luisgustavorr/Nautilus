@@ -1,7 +1,7 @@
 package tests
 
 import (
-	Thoughts "Nautilus/app/crud/thoughts"
+	Thoughts "Nautilus/app/modules/thoughts"
 	"fmt"
 	"testing"
 )

@@ -1,7 +1,7 @@
 package Errors
 
 import (
-	Tags "Nautilus/app/crud/tags"
+	Tags "Nautilus/app/modules/tags"
 	"time"
 )
 
@@ -18,7 +18,7 @@ type ErrorSaved struct {
 	How_to_reproduce  string    `json:"how_to_reproduce"`
 	Error_occurred_in time.Time `json:"error_occurred_in"`
 	//not native, recovered via QUERIES
-	Files_count  *int             `json:"files_count"`
+	Files_count  int              `json:"files_count"`
 	Files        *[]string        `json:"files"`
 	Tags         *[]Tags.TagSaved `json:"tags"`
 	Creator_name string           `json:"creator_name"`

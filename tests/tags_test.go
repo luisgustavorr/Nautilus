@@ -1,7 +1,7 @@
 package tests
 
 import (
-	Tags "Nautilus/app/crud/tags"
+	Tags "Nautilus/app/modules/tags"
 	"testing"
 )
 

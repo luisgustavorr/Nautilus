@@ -1,14 +1,19 @@
-if (BindInfos != undefined) {
-  $('#user_project').html(`${BindInfos.user_name} ${BindInfos.app_name != '' ? `/ <strong> ${BindInfos.app_name} </strong>` : ''}`)
-  if (BindInfos.user_profile_picture == '') {
-    $('#profile_picture').html(`<img src="https://api.dicebear.com/9.x/thumbs/svg?seed=${BindInfos.user_name}&amp;backgroundColor[]&amp;shapeColor=69d2e7,f1f4dc,f88c49" alt="avatar">`)
+let buttonsBlocked = {}
+function blockLoadingButton(element, disable) {
+  let id = $(element).attr('id')
+  if (disable) {
+    buttonsBlocked[id] = $(element).html()
+  $(element).html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
+    $(element).prop('disabled',true)
   } else {
-    $('#profile_picture').html(`<img src="./images/uploaded/profile_pictures/user_1/picture.png" alt="avatar">`)
-
+    $(element).html(buttonsBlocked[id])
+    $(element).prop('disabled',false)
+		delete buttonsBlocked[id]
   }
 }
+
 function formatDateLongWay(unformattedDate) {
-  return moment(unformattedDate).format('DD MMM YYYY hh:mm:A')
+  return moment(unformattedDate).format('DD MMM YYYY hh:mm A')
 }
 function removerAcentos(str) {
   const tabelaSubstituicao = {
@@ -29,11 +34,32 @@ function formatDate(unformattedDate) {
   let formattedDate = moment(unformattedDate).format('DD/MM/YYYY kk:mm')
   return formattedDate
 }
+function onElementAdded(containerSelector, elementSelector, callback) {
+  const target = $(containerSelector);
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.addedNodes.length) {
+        const elements = $(mutation.addedNodes).find(elementSelector);
+        elements.each(function() {
+          callback(this);
+        });
+      }
+    });
+  });
+
+  observer.observe(target[0], {
+    childList: true,
+    subtree: true
+  });
+}
+onElementAdded('body', 'format-date', function(element) {
+  $(element).text(formatDate($(element).text()))
+});
 function alertar(title, texto, width = window.outerWidth > 600 ? "500px" : "90%", buttons, type) {
 
   let buttons_obj = buttons !== undefined ? buttons : {
     OK: {
-      btnClass: 'btn-blue',
+      btnClass: `btn-${type || 'blue'}`,
       action: function () {
         return
       }
@@ -96,4 +122,9 @@ function BooleanButton(button, uniqueClass) {
   }
   $(button).addClass('using')
 
+}
+function QuickStatusAlert(status,message) {
+  let title = status == 500 ? 'Ixi...' : 'Sucesso'
+  let color = status == 500 ? 'red' : 'green'
+  alertar(title, message, undefined, undefined, color)
 }

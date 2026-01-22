@@ -116,7 +116,7 @@ func ToInt(v interface{}) int {
 	}
 }
 
-// função para converter qualquer tipo para float64
+// ToFloat função para converter qualquer tipo para float64
 func ToFloat(val interface{}) float64 {
 	switch v := val.(type) {
 	case float64:
@@ -168,6 +168,9 @@ func ParseJSON(jsonString string) ([]map[string]interface{}, error) {
 		return nil, fmt.Errorf("erro ao desserializar conteúdo interno: %w | conteúdo interno: %s", err, intermediate)
 	}
 	return produtos, nil
+}
+func SubPartialsPath(module string, subPartialName string) string {
+	return fmt.Sprintf(`partials/sub_partials/%s/%s`, module, subPartialName)
 }
 
 type ProdutoID string

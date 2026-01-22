@@ -1,7 +1,7 @@
 package tests
 
 import (
-	Errors "Nautilus/app/crud/errors"
+	Errors "Nautilus/app/modules/errors"
 	"fmt"
 	"testing"
 )

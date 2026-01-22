@@ -106,6 +106,7 @@ header {
   align-items: center;
   padding: 10px;
   justify-content: space-between;
+  z-index: 997;
 }
 
 #menu {
@@ -862,4 +863,7 @@ width: 200px;
 blockquote {
   border-left:0.25rem solid var(--gray);
   padding-left: 1rem;
+}
+#anexar_arquivos_comentario {
+   color: var(--gray);
 }
