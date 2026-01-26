@@ -2,11 +2,12 @@ package General
 
 import (
 	Store "Nautilus/store"
-	"database/sql"
 	"log"
+
+	"gorm.io/gorm"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
 
 func Setup() {
 	var err error

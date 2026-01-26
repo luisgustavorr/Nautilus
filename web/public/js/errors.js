@@ -77,14 +77,14 @@ if (BindInfos != undefined) {
 if (BindInfos.selected_error != undefined) {
     let err = BindInfos.selected_error
     let tags = BindInfos.selected_error.tags
-    $('#error_infos_title h3').html(`${err.title} <span>#${err.id}</span>`)
-    $('#error_infos_date_creation').text(formatDate(err.created_in))
-    $("#error_infos_tags").html(`
-        ${tags != undefined && tags != null ? tags.map(e => {
-        return `<div class="tag" style="color: ${e.color}; background: ${e.background};">
-                      ${e.name}
-                    </div>`
-    }).join('') : ``}`)
+    // $('#error_infos_title h3').html(`${err.title} <span>#${err.id}</span>`)
+    // $('#error_infos_date_creation').text(formatDate(err.created_in))
+    // $("#error_infos_tags").html(`
+    //     ${tags != undefined && tags != null ? tags.map(e => {
+    //     return `<div class="tag" style="color: ${e.Color}; background: ${e.Background};">
+    //                   ${e.Name}
+    //                 </div>`
+    // }).join('') : ``}`)
     // getThoughtsFromErrorAndLoad(err.id)
 } else {
     console.log('Sem id')

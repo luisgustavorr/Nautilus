@@ -1,15 +1,18 @@
 package Tags
 
 type TagSaved struct {
-	Id          *int   `json:"id"`
-	Id_apps     int    `json:"id_apps"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Color       string `json:"color"`
-	Background  string `json:"background"`
-	Type        int    `json:"type"`
+	Id          *int   `gorm:"column:id;primaryKey"`
+	Id_apps     int    `gorm:"column:id_apps"`
+	Name        string `gorm:"column:name"`
+	Description string `gorm:"column:description"`
+	Color       string `gorm:"column:color"`
+	Background  string `gorm:"column:background"`
+	Type        int    `gorm:"column:type"`
 }
 
+func (TagSaved) TableName() string {
+	return "tags"
+}
 func NewTagToSave(id_app int, name string, description string, opts ...func(*TagSaved)) *TagSaved {
 	e := &TagSaved{
 		Id_apps:     id_app,

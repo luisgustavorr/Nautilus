@@ -1,26 +1,37 @@
 {{template "partials/header" .}}
 {{template "partials/sidebar" .}}
-<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.snow.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.snow.css" rel="stylesheet" />
 
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.0-rc.5/dist/quill.js"></script>
 
 <section id="body_wrapper">
     <div id="error_infos">
         <div id="error_infos_title">
-            <h3>Randomly and unexpected tag/mention IOS user <span>#30</span></h3>
+            <h3>{{.selected_error.Title}} <span>#{{.selected_error.Id}}</span></h3>
+            {{if not .selected_error.Verified}}
+
             <button><i class="fa-solid fa-check"></i> FINALIZAR</button>
+            {{end}}
         </div>
         <div id="error_infos_subtitle">
             <div id="error_infos_status_and_tags">
-                <div id="error_infos_status">
+                <div id="error_infos_status" class="{{if .selected_error.Verified}} verified {{else}} pending {{end}}">
+                    {{if .selected_error.Verified}}
+                    <i class="fa-regular fa-circle-check"></i>Verificado
+                    {{else}}
                     <i class="fa-solid fa-clock"></i> Pendente
+                    {{end}}
                 </div>
                 <div id="error_infos_tags">
-
+                    {{range .selected_error.Tags}}
+                    <div class="tag" style="color: {{.Color}}; background: {{.Background}};">
+                        {{.Name}}
+                    </div>
+                    {{end}}
                 </div>
             </div>
             <span id="error_infos_date_creation">
-                10/02/2026 10:30
+                <format-date>{{.selected_error.Created_in.Format "2006-01-02T15:04:05-07:00"}}</format-date>
             </span>
         </div>
 
@@ -31,8 +42,9 @@
             {{range .thoughts}}
             <div class="error_comment_parent">
                 <div class="error_comment_perfil_image">
-                    {{if .Creator_profile_picture}}
-                    <img src="https://api.dicebear.com/9.x/thumbs/svg?seed={{.Creator_name}}&amp;backgroundColor[]&amp;shapeColor=69d2e7,f1f4dc,f88c49" alt="avatar">
+                    {{if not .Creator_profile_picture}}
+                    <img src="https://api.dicebear.com/9.x/thumbs/svg?seed={{.Creator_name}}&amp;backgroundColor[]&amp;shapeColor=69d2e7,f1f4dc,f88c49"
+                        alt="avatar" >
                     {{else}}
                     <img src="./images/uploaded/profile_pictures/user_{{.Creator_id}}/picture.png" alt="avatar">
                     {{end}}
@@ -41,20 +53,22 @@
                     <div class="error_comment_header">
                         <div class="error_comment_header_text">
                             <h5>{{.Creator_name}}</h5>
-                            <p><format-date-long>{{.Created_in}}</format-date-long></p>
+                            <p><format-date-long>{{.Created_in.Format "2006-01-02T15:04:05-07:00"}}</format-date-long></p>
                         </div>
                         <div class='actions_parents'>
                             <i class="fa-solid fa-pen-to-square"></i>
                             <i class="fa-solid fa-paperclip" title="Arquivos anexados"></i>
-                            <i class="fa-solid fa-quote-right quote_comment" title="Responder comentário" data-error_id="${e.id}"></i>
+                            <i class="fa-solid fa-quote-right quote_comment" title="Responder comentário"
+                                data-error_id="{{.Id}}"></i>
                         </div>
                     </div>
                     <div class="error_comment_body">
-                        ${e.thought}
+                        {{.Thought}}
                     </div>
                 </div>
 
             </div>
+            <div class="error_comment_splitter"></div>
             {{end}}
             {{end}}
             <!--            <div class="loading_spinner">-->
@@ -67,9 +81,23 @@
                     <h3>RESUMO</h3>
                 </div>
                 <div id="error_summary_body">
-                    <div class="loading_spinner">
-                        <i class="fa-solid fa-spinner fa-spin-pulse "></i>
+                   {{if .thoughts}}
+            {{range .thoughts}}
+            <div class="error_summary_row">
+                        <div class="error_summary_row_writer_name">
+                            <span>{{.Creator_name}}</span>
+                        </div>
+                        <div class="error_summary_row_message">
+                            <i class="fa-solid fa-turn-up"></i>
+                            <div class='message_text'>{{.Thought}} </div>
+                        </div>
+                        <div class="error_summary_row_date">
+                        <format-date>{{.Created_in.Format "2006-01-02T15:04:05-07:00"}}</format-date>
+                        </div>
                     </div>
+            {{end}}
+            {{end}}
+
                 </div>
             </div>
         </div>
@@ -124,7 +152,7 @@
                 </span>
                 <span class="ql-formats">
                     <button title="Vincular Link" class="option_class ql-link"></button>
-                    <button title="Anexar Arquivo" id="anexar_arquivos_comentario">  <i
+                    <button title="Anexar Arquivo" id="anexar_arquivos_comentario"> <i
                             class="fa-solid fa-paperclip"></i></button>
                     <!-- <button title="Adicionar Imagem" class="option_class ql-image"></button> -->
                     <!-- <button title="Adicionar Link"class="option_class ql-video"></button> -->

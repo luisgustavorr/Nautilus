@@ -7,71 +7,87 @@ import (
 )
 
 func AddTought(toughtToSave ThoughtSaved) (error, int) {
-	var insertedId int
-	err := General.DB.QueryRow("INSERT INTO thoughts (id_errors,creator_id,thought,created_in,vinculated_to,files) VALUES($1,$2,$3,$4,$5,$6) RETURNING id", toughtToSave.Id_errors, toughtToSave.Creator_id, toughtToSave.Thought, toughtToSave.Created_in, toughtToSave.Vinculated_to, General.JsonViewInterface(toughtToSave.Files)).Scan(&insertedId)
-	return err, insertedId
+	err := General.DB.Create(&toughtToSave).Error
+	if err != nil {
+		return err, 0
+	}
+
+	if toughtToSave.Id != nil {
+		return nil, *toughtToSave.Id
+	}
+	return nil, 0
 }
 
 func GetThought(thoughtId int) (error, []ThoughtSaved) {
-	var thoughtsSaved = []ThoughtSaved{}
-	filter := ""
+	var thoughtsSaved []ThoughtSaved
+
+	db := General.DB.Model(&ThoughtSaved{})
 	if thoughtId != 0 {
-		filter = fmt.Sprintf("WHERE id = %d", thoughtId)
+		db = db.Where("id = ?", thoughtId)
 	}
-	query := fmt.Sprintf("SELECT id,id_errors,creator_id,thought,created_in,vinculated_to,files FROM thoughts %s", filter)
-	rows, err := General.DB.Query(query)
-	if err == nil {
-		defer rows.Close()
-		for rows.Next() {
-			var thoughtSaved = ThoughtSaved{}
-			var jsonFiles []byte
-			err = rows.Scan(&thoughtSaved.Id, &thoughtSaved.Id_errors, &thoughtSaved.Creator_id, &thoughtSaved.Thought, &thoughtSaved.Created_in, &thoughtSaved.Vinculated_to, &jsonFiles)
-			if err == nil {
-				if len(jsonFiles) > 0 {
-					var files []string
-					if err := json.Unmarshal(jsonFiles, &files); err != nil {
-						return err, nil
-					}
-					thoughtSaved.Files = &files
-				}
-				thoughtsSaved = append(thoughtsSaved, thoughtSaved)
-			}
-		}
-	}
+
+	err := db.Order("id asc").Find(&thoughtsSaved).Error
 	return err, thoughtsSaved
 }
+
 func GetThoughtByErrorId(errorId int) (error, []ThoughtSaved) {
-	var thoughtsSaved = []ThoughtSaved{}
 	if errorId == 0 {
-		return fmt.Errorf("errorid = 0"), thoughtsSaved
+		return fmt.Errorf("errorid = 0"), nil
 	}
-	query := `SELECT t.id,t.id_errors,t.creator_id,t.thought,t.created_in,t.vinculated_to,t.files,u."name" as creator_name,u.profile_picture as creator_profile_picture  FROM thoughts t left join users u on u.id  = t.creator_id where  t.id_errors = $1 ORDER BY t.id asc`
-	rows, err := General.DB.Query(query, errorId)
-	if err == nil {
-		defer rows.Close()
-		for rows.Next() {
-			var thoughtSaved = ThoughtSaved{}
-			var jsonFiles []byte
-			err = rows.Scan(&thoughtSaved.Id, &thoughtSaved.Id_errors, &thoughtSaved.Creator_id, &thoughtSaved.Thought, &thoughtSaved.Created_in, &thoughtSaved.Vinculated_to, &jsonFiles, &thoughtSaved.Creator_name, &thoughtSaved.Creator_profile_picture)
-			if err == nil {
-				if len(jsonFiles) > 0 {
-					var files []string
-					if err := json.Unmarshal(jsonFiles, &files); err != nil {
-						return err, nil
-					}
-					thoughtSaved.Files = &files
-				}
-				thoughtsSaved = append(thoughtsSaved, thoughtSaved)
-			}
+
+	query := `
+	SELECT
+		t.id,
+		t.id_errors,
+		t.creator_id,
+		t.thought,
+		t.created_in,
+		t.vinculated_to,
+		t.files,
+		u.name as creator_name,
+		u.profile_picture as creator_profile_picture
+	FROM thoughts t
+	LEFT JOIN users u ON u.id = t.creator_id
+	WHERE t.id_errors = ?
+	ORDER BY t.id ASC
+	`
+	var rows []thoughtRow
+	err := General.DB.Raw(query, errorId).Scan(&rows).Error
+	if err != nil {
+		return err, nil
+	}
+
+	var result []ThoughtSaved
+	for _, r := range rows {
+		t := r.ThoughtSaved
+
+		if len(r.FilesJSON) > 0 {
+			var files []string
+			_ = json.Unmarshal(r.FilesJSON, &files)
+			t.Files = &files
 		}
+
+		result = append(result, t)
 	}
-	return err, thoughtsSaved
+
+	return nil, result
 }
+
 func UpdateThought(toughtToSave ThoughtSaved) error {
-	_, err := General.DB.Exec("UPDATE thoughts SET id_errors = $1,creator_id = $2,thought=$3 WHERE id = $4", toughtToSave.Id_errors, toughtToSave.Creator_id, toughtToSave.Thought, toughtToSave.Id)
-	return err
+	if toughtToSave.Id == nil {
+		return fmt.Errorf("thought id is nil")
+	}
+
+	return General.DB.
+		Model(&ThoughtSaved{}).
+		Where("id = ?", *toughtToSave.Id).
+		Updates(map[string]interface{}{
+			"id_errors":  toughtToSave.Id_errors,
+			"creator_id": toughtToSave.Creator_id,
+			"thought":    toughtToSave.Thought,
+		}).Error
 }
+
 func DeleteThought(thoughtId int) error {
-	_, err := General.DB.Exec("DELETE FROM thoughts WHERE id = $1", thoughtId)
-	return err
+	return General.DB.Delete(&ThoughtSaved{}, thoughtId).Error
 }

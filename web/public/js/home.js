@@ -18,21 +18,21 @@ fetch('/get_error_tags/1', {
                 `)
   });
 $('#last_edit,#date_creation').data('val', "1")
-$.ajax({
-  url: '/get_errors/1',
-  method: 'GET',
-  contentType: 'text/html',
-  success: function (ret) {
-    console.log(ret)
-    $('.tabela_body').html(ret)
+// $.ajax({
+//   url: '/get_errors/1',
+//   method: 'GET',
+//   contentType: 'text/html',
+//   success: function (ret) {
+//     console.log(ret)
+//     $('.tabela_body').html(ret)
 
-  },
-  error: function (err) {
-    console.log(err)
-  }
-});
+//   },
+//   error: function (err) {
+//     console.log(err)
+//   }
+// });
 function loadErrorsInTable(data) {
-  $('.tabela_body').html("")
+  // $('.tabela_body').html("")
   $('.tabela_counter').html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
 
   for (const e of data) {
@@ -154,17 +154,24 @@ function filterErrors(errors) {
   loadErrorsInTable(errors)
 
 }
-filterErrors(lastErrorsRecovered)
+// filterErrors(lastErrorsRecovered)
 $('#last_edit,#date_creation').click(function () {
   filterErrors(lastErrorsRecovered)
 })
 $('body').on('click', '.infos_columns_files_row', function () {
-  let id = $(this).attr('id_error')
-  let error = lastErrorsRecovered.find(e => e.id == parseInt(id))
-  console.log(error)
-  if (error.files == undefined || error.files.length == 0) {
-    alertar("Opa", "Esse erro não possui anexos")
-    return
-  }
-  new browse(error.files, `/images/uploaded/error_files/error_${error.id}/`)
+  let id = $(this).data('id_error')
+  $.ajax({
+    url: '/get_files_from_error/' + id,
+    method: 'GET',
+    contentType: 'application/json',
+
+    success: function (ret) {
+      console.log(ret)
+      new browse(ret, `/images/uploaded/error_files/error_${id}/`)
+
+    },
+    error: function (err) {
+      console.log(err)
+    }
+  });
 })

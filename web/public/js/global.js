@@ -3,17 +3,24 @@ function blockLoadingButton(element, disable) {
   let id = $(element).attr('id')
   if (disable) {
     buttonsBlocked[id] = $(element).html()
-  $(element).html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
-    $(element).prop('disabled',true)
+    $(element).html(`<i class="fa-solid fa-spinner fa-spin-pulse"></i>`)
+    $(element).prop('disabled', true)
   } else {
     $(element).html(buttonsBlocked[id])
-    $(element).prop('disabled',false)
-		delete buttonsBlocked[id]
+    $(element).prop('disabled', false)
+    delete buttonsBlocked[id]
   }
 }
 
 function formatDateLongWay(unformattedDate) {
-  return moment(unformattedDate).format('DD MMM YYYY hh:mm A')
+  let formatted = moment(unformattedDate)
+  if (formatted.isValid()) {
+    return formatted.format('DD MMM YYYY hh:mm A')
+  } else {
+    console.log(`data inválida : "${unformattedDate}"`)
+
+  }
+
 }
 function removerAcentos(str) {
   const tabelaSubstituicao = {
@@ -31,16 +38,21 @@ function removerAcentos(str) {
   return str.replace(/[áàãâéèêíìîóòõôúùûÁÀÃÂÉÈÊÍÌÎÓÒÕÔÚÙÛ]/g, match => tabelaSubstituicao[match]);
 }
 function formatDate(unformattedDate) {
-  let formattedDate = moment(unformattedDate).format('DD/MM/YYYY kk:mm')
+  let formattedDate = moment(unformattedDate)
+  if (formattedDate.isValid()) {
+    return formattedDate.format('DD/MM/YYYY kk:mm')
+  } else {
+    console.log(`data inválida : "${unformattedDate}"`)
+  }
   return formattedDate
 }
 function onElementAdded(containerSelector, elementSelector, callback) {
   const target = $(containerSelector);
-  const observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
+  const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
       if (mutation.addedNodes.length) {
         const elements = $(mutation.addedNodes).find(elementSelector);
-        elements.each(function() {
+        elements.each(function () {
           callback(this);
         });
       }
@@ -52,8 +64,23 @@ function onElementAdded(containerSelector, elementSelector, callback) {
     subtree: true
   });
 }
-onElementAdded('body', 'format-date', function(element) {
-  $(element).text(formatDate($(element).text()))
+onElementAdded('body', 'format-date', function (element) {
+  let already_formatted =   $(element).data('already_formatted')
+  if (!already_formatted){
+  let data_formatada = formatDate($(element).text())
+  $(element).data('already_formatted',true)
+  $(element).text(data_formatada)
+  }
+
+});
+onElementAdded('body', 'format-date-long', function (element) {
+  let already_formatted =   $(element).data('already_formatted')
+  if (!already_formatted){
+  let data_formatada = formatDateLongWay($(element).text())
+  $(element).data('already_formatted',true)
+  $(element).text(data_formatada)
+  }
+
 });
 function alertar(title, texto, width = window.outerWidth > 600 ? "500px" : "90%", buttons, type) {
 
@@ -123,7 +150,7 @@ function BooleanButton(button, uniqueClass) {
   $(button).addClass('using')
 
 }
-function QuickStatusAlert(status,message) {
+function QuickStatusAlert(status, message) {
   let title = status == 500 ? 'Ixi...' : 'Sucesso'
   let color = status == 500 ? 'red' : 'green'
   alertar(title, message, undefined, undefined, color)

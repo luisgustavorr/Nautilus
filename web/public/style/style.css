@@ -525,14 +525,20 @@ gap: 0.5rem;
   align-items: center;
   justify-content: center;
   gap: 0.2rem;
-  background: var(--orange);
   color: white;
   border-radius: 5px;
   padding: 0.1rem 1rem;
   font-weight: bold;
   height: 1.7rem;
 }
+#error_infos_status.pending{
+  background: var(--orange);
 
+}
+#error_infos_status.verified{
+  background: var(--green);
+
+}
 #error_infos_date_creation {
   font-size: 01rem;
   color: var(--dark-gray);
@@ -718,7 +724,9 @@ gap: 0.4rem;
   background: var(--gray);
   margin-left: 10rem;
 }
-
+.error_comment_splitter:last-of-type{
+  display: none;
+}
 .error_comment_header_text p {
   font-size: 0.8rem;
 }

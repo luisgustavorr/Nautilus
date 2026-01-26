@@ -17,34 +17,82 @@
     <section id="table_errors" class="tabela">
         <div class="tabela_header">
             <div class="tabela_counter">
-             <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+              #{{.errors_selected_length}}
             </div>
             <div class="tabela_buttons">
                 <div id="search_creator">
                     <input onenter placeholder="Procurar autor" type="text" name="" id="search_creator_input">
                     <i onclick="filterErrors(lastErrorsRecovered)" class="fa-solid fa-magnifying-glass"></i>
                 </div>
-              
-                <select onchange="filterErrors(lastErrorsRecovered)" name="select_status_filter" id="select_status_filter">
+
+                <select onchange="filterErrors(lastErrorsRecovered)" name="select_status_filter"
+                    id="select_status_filter">
                     <option value="" selected> STATUS</option>
                     <option value="1">VERIFICADO</option>
                     <option value="0">PENDENTE</option>
                 </select>
-                <select onchange="filterErrors(lastErrorsRecovered)" name="select_tag_filter" id="select_tag_filter" >
+                <select onchange="filterErrors(lastErrorsRecovered)" name="select_tag_filter" id="select_tag_filter">
                     <option value="" selected> TAG</option>
                 </select>
-                  <button id="last_edit"  data-value="0"  onclick="BooleanButton(this,'date_order')" class="date_order">
-                  <i class="fa-solid fa-arrow-up"></i> Última Alteração
+                <button id="last_edit" data-value="0" onclick="BooleanButton(this,'date_order')" class="date_order">
+                    <i class="fa-solid fa-arrow-up"></i> Última Alteração
                 </button>
-                <button id="date_creation"  data-value="0" onclick="BooleanButton(this,'date_order')" class="date_order using">
-               <i class="fa-solid fa-arrow-up"></i> Data Criação
+                <button id="date_creation" data-value="0" onclick="BooleanButton(this,'date_order')"
+                    class="date_order using">
+                    <i class="fa-solid fa-arrow-up"></i> Data Criação
                 </button>
             </div>
         </div>
         <div class="tabela_body">
-           
+            {{range .errors_selected}}
+            <div class="error_row">
+                <div class="status_column">
+                    <div class="status_icon_error">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                </div>
+                <div class="main_column">
+                    <a class="error_title" href="/error_{{.Id}}">
+                        {{.Title}}
+                    </a>
+                    <p class="error_description">
+                        Criado por: {{.Creator_name}} às
+                        <format-date>{{ .Created_in.Format "2006-01-02T15:04:05-07:00" }}</format-date>
+                    </p>
+                    <div class="error_tags">
+                        {{if .Tags}}
+                        {{range .Tags}}
+                        <div class="tag" style="color:{{.Color}};background: {{.Background}};" title="{{.Description}}">
+                            {{.Name}}
+                        </div>
+                        {{end}}
+                        {{end}}
+                    </div>
+                </div>
+                <div class="infos_column">
+                    <div class="infos_column_first_row">
+                        <span class="error_id">#{{.Id}}</span>
+                        <div class="date_infos">
+                            <span>
+                                <i class="fa-solid fa-clock" title="O erro ocorreu nesse horário"></i>
+                                <format-date>{{.Error_occurred_in.Format "2006-01-02T15:04:05-07:00"}}</format-date>
+                            </span>
+                            <span>
+                                <i class="fa-solid fa-arrows-spin" title="Última edição no erro"></i>
+                                <format-date>{{.Last_edited_in.Format "2006-01-02T15:04:05-07:00"}}</format-date>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="infos_columns_files_row" data-id_error="{{.Id}}">
+                        <i class="fa-solid fa-images"></i> {{.Files_count}} arquivo(s) anexado(s)
+                    </div>
+                </div>
+            </div>
+       
+        {{end}}
+         </div>
         </div>
 
     </section>
 </section>
-            <script src="./js/home.js"></script>
+<script src="./js/home.js"></script>

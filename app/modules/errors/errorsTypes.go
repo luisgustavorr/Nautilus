@@ -6,22 +6,33 @@ import (
 )
 
 type ErrorSaved struct {
-	Id                *int      `json:"id"`
-	Id_apps           int       `json:"id_apps"`
-	Message           string    `json:"message"`
-	Title             string    `json:"title"`
-	Verified          bool      `json:"verified"`
-	Error_level       int       `json:"error_level"`
-	Creator_id        int       `json:"creator_id"`
-	Created_in        time.Time `json:"created_in"`
-	Last_edited_in    time.Time `json:"last_edited_in"`
-	How_to_reproduce  string    `json:"how_to_reproduce"`
-	Error_occurred_in time.Time `json:"error_occurred_in"`
-	//not native, recovered via QUERIES
-	Files_count  int              `json:"files_count"`
-	Files        *[]string        `json:"files"`
-	Tags         *[]Tags.TagSaved `json:"tags"`
-	Creator_name string           `json:"creator_name"`
+	Id                *int      `json:"id" gorm:"column:id;primaryKey"`
+	Id_apps           int       `json:"id_apps" gorm:"column:id_apps"`
+	Message           string    `json:"message" gorm:"column:message"`
+	Title             string    `json:"title" gorm:"column:title"`
+	Verified          bool      `json:"verified" gorm:"column:verified"`
+	Error_level       int       `json:"error_level" gorm:"column:error_level"`
+	Creator_id        int       `json:"creator_id" gorm:"column:creator_id"`
+	Created_in        time.Time `json:"created_in,string" gorm:"column:created_in"`
+	Last_edited_in    time.Time `json:"last_edited_in,string" gorm:"column:last_edited_in"`
+	How_to_reproduce  string    `json:"how_to_reproduce" gorm:"column:how_to_reproduce"`
+	Error_occurred_in time.Time `json:"error_occurred_in,string" gorm:"column:error_occurred_in"`
+
+	// not native, recovered via QUERIES
+	Files_count  int              `json:"files_count" gorm:"-"`
+	Files        *[]string        `json:"files" gorm:"-"`
+	Tags         *[]Tags.TagSaved `json:"tags" gorm:"-"`
+	Creator_name string           `json:"creator_name" gorm:"-"`
+}
+
+func (ErrorSaved) TableName() string {
+	return "errors"
+}
+
+type errorRow struct {
+	ErrorSaved
+	TagsJSON  []byte `gorm:"column:tags"`
+	FilesJSON []byte `gorm:"column:files"`
 }
 
 func NewErrorToSave(appID int, creatorID int, title string, message string, opts ...func(*ErrorSaved)) *ErrorSaved {

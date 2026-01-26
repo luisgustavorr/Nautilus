@@ -6,39 +6,47 @@ import (
 )
 
 func AddApp(appToSave AppSaved) (error, int) {
-	insertedId := 0
+	err := General.DB.Create(&appToSave).Error
+	if err != nil {
+		return err, 0
+	}
 
-	err := General.DB.QueryRow("INSERT INTO apps (name,perfil_image,description) VALUES ($1,$2,$3) RETURNING id", appToSave.Name, appToSave.Perfil_image, appToSave.Description).Scan(&insertedId)
-	return err, insertedId
+	if appToSave.Id != nil {
+		return nil, *appToSave.Id
+	}
+	return nil, 0
 }
+
 func GetApp(appId int) (error, []AppSaved) {
 	apps := []AppSaved{}
-	filter := ""
+
+	db := General.DB.Model(&AppSaved{})
 	if appId != 0 {
-		filter = fmt.Sprintf("WHERE id = %d", appId)
+		db = db.Where("id = ?", appId)
 	}
-	query := fmt.Sprintf("SELECT id,name,perfil_image,description FROM apps %s", filter)
-	rows, err := General.DB.Query(query)
-	if err == nil {
-		defer rows.Close()
-		for rows.Next() {
-			var appSaved AppSaved
-			err = rows.Scan(&appSaved.Id, &appSaved.Name, &appSaved.Perfil_image, &appSaved.Description)
-			if err == nil {
-				apps = append(apps, appSaved)
-			}
-		}
-	}
+
+	err := db.Find(&apps).Error
 	return err, apps
 }
+
 func DeleteApp(appId int) error {
 	if appId == 0 {
 		return fmt.Errorf("errorId = 0, falha ao apagar")
 	}
-	_, err := General.DB.Exec("DELETE FROM apps WHERE id = $1", appId)
-	return err
+	return General.DB.Delete(&AppSaved{}, appId).Error
 }
+
 func UpdateApp(appToSave AppSaved) error {
-	_, err := General.DB.Exec("UPDATE apps SET name = $2,perfil_image =$3,description=$4 WHERE id = $1", appToSave.Id, appToSave.Name, appToSave.Perfil_image, appToSave.Description)
-	return err
+	if appToSave.Id == nil {
+		return fmt.Errorf("app id is nil")
+	}
+
+	return General.DB.
+		Model(&AppSaved{}).
+		Where("id = ?", *appToSave.Id).
+		Updates(map[string]interface{}{
+			"name":         appToSave.Name,
+			"perfil_image": appToSave.Perfil_image,
+			"description":  appToSave.Description,
+		}).Error
 }

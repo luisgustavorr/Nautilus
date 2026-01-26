@@ -1,13 +1,17 @@
 package Users
 
 type UserSaved struct {
-	Id               *int   `json:"id"`
-	Id_apps          int    `json:"id_apps"`
-	Name             string `json:"name"`
-	Description      string `json:"description"`
-	Role             string `json:"role"`
-	Permission_level int    `json:"permission_level"`
-	Profile_picture  string `json:"profile_picture"`
+	Id               *int   `gorm:"column:id;primaryKey"`
+	Id_apps          int    `gorm:"column:id_apps"`
+	Name             string `gorm:"column:name"`
+	Description      string `gorm:"column:description"`
+	Role             string `gorm:"column:role"`
+	Permission_level int    `gorm:"column:permission_level"`
+	Profile_picture  string `gorm:"column:profile_picture"`
+}
+
+func (UserSaved) TableName() string {
+	return "users"
 }
 
 func NewUserSaved(id_apps int, name string, description string, opts ...func(*UserSaved)) *UserSaved {

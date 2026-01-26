@@ -12,8 +12,9 @@ import (
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-
 	"golang.org/x/crypto/ssh"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var _ = godotenv.Load()
@@ -31,10 +32,10 @@ func proxyConnection(local, remote net.Conn) {
 	}()
 }
 
-var DB *sql.DB
+var DB *gorm.DB
 var DBMutex sync.Mutex
 
-func ConnectPsql() (*sql.DB, error) {
+func ConnectPsql() (*gorm.DB, error) {
 	DBMutex.Lock()
 	defer DBMutex.Unlock()
 	if DB != nil {
@@ -54,10 +55,13 @@ func ConnectPsql() (*sql.DB, error) {
 	fmt.Println("Teste", dbUser, dbPassword, dbName)
 	var psqlInfo string
 	if deployMode == "production" {
-		fmt.Println("🚀🔗->> CONEXÃO DIRETA SEM SSH")
-		// Modo direto (sem SSH)
-		psqlInfo = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-			dbHost, dbPort, dbUser, dbPassword, dbName)
+		dbUser := os.Getenv("USER_DB")
+		dbPassword := os.Getenv("PASSWORD_DB")
+		dbName := os.Getenv("DB_NAME")
+		dbHost := os.Getenv("HOST_DB") // Host do banco (público ou interno)
+		dbPort := os.Getenv("DB_PORT") // Porta do banco de dados
+		psqlInfo = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, dbPort, dbName)
+
 	} else {
 		fmt.Println("🚀🔗->> CONEXÃO USANDO SSH")
 		// Modo com SSH
@@ -115,10 +119,13 @@ func ConnectPsql() (*sql.DB, error) {
 		// String de conexão via túnel
 		psqlInfo = fmt.Sprintf("host=localhost port=%s user=%s password=%s dbname=%s sslmode=disable",
 			localPort, dbUser, dbPassword, dbName)
+		dbHost = "localhost"
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPassword, dbHost, localPort, dbName)
 	}
 
 	// Conexão com o banco (comum para ambos os modos)
-	db, err := sql.Open("postgres", psqlInfo)
+	sqlDB, err := sql.Open("pgx", psqlInfo)
+
 	if err != nil {
 		return nil, fmt.Errorf("erro ao abrir conexão com PostgreSQL: %v", err)
 	}
@@ -127,14 +134,20 @@ func ConnectPsql() (*sql.DB, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := db.PingContext(ctx); err != nil {
+	if err := sqlDB.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("ping ao banco de dados falhou: %v", err)
 	}
 	// Configurações do pool de conexões
-	db.SetMaxOpenConns(75)
-	// db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(5 * time.Minute)
-	db.SetConnMaxIdleTime(2 * time.Minute)
-	DB = db
-	return DB, nil
+	sqlDB.SetMaxOpenConns(5)
+	sqlDB.SetMaxIdleConns(5)
+	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(2 * time.Minute)
+	gormDB, err := gorm.Open(postgres.New(postgres.Config{
+		Conn: sqlDB,
+	}), &gorm.Config{})
+	if err == nil {
+		DB = gormDB
+		return gormDB, nil
+	}
+	return nil, err
 }

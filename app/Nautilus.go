@@ -84,8 +84,16 @@ func Start() {
 			return c.Status(500).JSON(map[string]interface{}{"Error": "tem algo de errado com o seu login, contate o suporte, apperr"})
 		}
 		app := apps[0]
+		err, errors := Errors.GetErrorsByAppId(*app.Id)
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{
+				"Error": err.Error(),
+			})
+		}
 		bindInfos := General.CreateBindInfos("home")
 		bindInfos["user_name"] = user.Name
+		bindInfos["errors_selected"] = errors
+		bindInfos["errors_selected_length"] = len(errors)
 		bindInfos["user_profile_picture"] = user.Profile_picture
 		bindInfos["app_name"] = app.Name
 		return c.Render("home", bindInfos)
@@ -127,6 +135,7 @@ func Start() {
 				"Error": err.Error(),
 			})
 		}
+		fmt.Println(General.JsonViewInterface(thoughts))
 		bindInfos := General.CreateBindInfos("home")
 		bindInfos["user_name"] = user.Name
 		bindInfos["user_profile_picture"] = user.Profile_picture
@@ -164,6 +173,21 @@ func Start() {
 			})
 		}
 		return c.Render(General.SubPartialsPath("errors", "errors_table"), errors)
+	})
+	app.Get("/get_files_from_error/:error_id", func(c *fiber.Ctx) error {
+		errorId := c.Params("error_id")
+		err, errors := Errors.GetErrors(General.ToInt(errorId))
+		if err != nil {
+			return c.Status(500).JSON(map[string]interface{}{
+				"Error": err.Error(),
+			})
+		}
+		if len(errors) == 0 {
+			return c.Status(500).JSON(map[string]interface{}{
+				"Error": "Não existe um erro com esse id",
+			})
+		}
+		return c.Status(200).JSON(errors[0].Files)
 	})
 	log.Fatal(app.Listen(":3120"))
 }

@@ -1,10 +1,14 @@
 package Apps
 
 type AppSaved struct {
-	Id           *int   `json:"id"`
-	Name         string `json:"name"`
-	Perfil_image string `json:"perfil_image"`
-	Description  string `json:"description"`
+	Id           *int   `gorm:"column:id;primaryKey"`
+	Name         string `gorm:"column:name"`
+	Perfil_image string `gorm:"column:perfil_image"`
+	Description  string `gorm:"column:description"`
+}
+
+func (AppSaved) TableName() string {
+	return "apps"
 }
 
 func NewAppSaved(name string, perfil_image string, description string, opts ...func(*AppSaved)) *AppSaved {
